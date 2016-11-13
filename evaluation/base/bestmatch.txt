@@ -1,0 +1,84 @@
+: Land-Währung
+China-Yuan
+Deutschland-Euro
+Dänemark-Krone
+England-Pfund
+Japan-Yen
+Russland-Rubel
+USA-Dollar
+: Hauptstad-Land
+Athen-Griechenland
+Bagdad-Irak
+Bangkok-Thailand
+Berlin-Deutschland
+Bern-Schweiz
+Hanoi-Vietnam
+Helsinki-Finnland
+Kairo-Ägypten
+Kiew-Ukraine
+London-England
+Madrid-Spanien
+Melbourne-Australien
+Moskau-Russland
+Oslo-Norwegen
+Ottawa-Kanada
+Paris-Frankreich
+Rom-Italien
+Stockholm-Schweden
+Teheran-Iran
+Tokio-Japan
+Washington-USA
+: Land-Kontinent
+Brasilien-Südamerika
+China-Asien
+Deutschland-Europa
+England-Europa
+Frankreich-Europa
+Griechenland-Europa
+Indien-Asien
+Italien-Europa
+Kanada-Nordamerika
+Polen-Europa
+USA-Nordamerika
+Vietnam-Asien
+Ägypten-Afrika
+: Land-Sprache
+China-Chinesisch
+Deutschland-Deutsch
+England-Englisch
+Frankreich-Französisch
+Griechenland-Griechisch
+Italien-Italienisch
+Japan-Japanisch
+Korea-Koreanisch
+Norwegen-Norwegisch
+Polen-Polnisch
+Russland-Russisch
+Schweden-Schwedisch
+Spanien-Spanisch
+Ukraine-Ukrainisch
+: Politik
+Elisabeth-Königin
+Charles-Prinz
+: Technik
+Android-Google
+iOS-Apple
+Windows-Microsoft
+: Geschlecht
+Bruder-Schwester
+Bräutigam-Braut
+Ehemann-Ehefrau
+Enkel-Enkelin
+er-sie
+Er-Sie
+Großvater-Großmutter
+Junge-Mädchen
+König-Königin
+Mann-Frau
+männlich-weiblich
+Neffe-Nichte
+Onkel-Tante
+Papa-Mama
+Partner-Partnerin
+Prinz-Prinzessin
+Vater-Mutter
