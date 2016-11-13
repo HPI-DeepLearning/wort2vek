@@ -33,4 +33,4 @@ class LeipzigCorpus:
                 sentences_file = os.path.join(self.dirname, corpus, fname)
                 for line in open(sentences_file):
                     # Lines are of form: 'LineNumber\tActualSentence\n'
-                    yield line.split('\t')[1].strip()
+                    yield line.split('\t')[1].strip().split()
