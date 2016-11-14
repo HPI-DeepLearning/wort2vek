@@ -2,7 +2,19 @@
 Bringing word2vec to the German language.
 
 ## Getting started with the Leizpig Corpus
+The [Leizpig Corpora Collection](http://corpora2.informatik.uni-leipzig.de/download.html) contains sentences from
+articles and wikipedia for each year from 1995 to 2015.
 
+### Download Leipzig Corpus
+To download all news and wikipedia corpora for all years run:
+
+```python
+>>> import goethe.utils.leipzig_corpora_downloader
+>>> download_corpora_news()
+>>> download_corpora_wiki()
+```
+
+### Import Leizpig Corpus
 The [Leizpig Corpora Collection](http://corpora2.informatik.uni-leipzig.de/download.html) is a quick way to start training models for the German language. You can load a corpus and iterate its sentences with the following code:
 ```python
 from goethe.corpora import LeipzigCorpus
@@ -59,4 +71,3 @@ To test our model on multiple such [queries](https://github.com/rshkv/goethe/blo
 ```
 
 The resulting list contains a tuple for each section with its name and accuracy. The accuracy here is the percentage of 4-tuples in which the `topn` words returned by  `most_similar` contained the right word.
-

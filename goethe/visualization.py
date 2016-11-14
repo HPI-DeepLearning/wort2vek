@@ -17,7 +17,7 @@ class TSNEVisualizer:
         return self.model[words]
 
     def transform(self, embeddings):
-        tsne = TSNE(perplexity=30, n_components=2, init='pca', n_iter=5000)
+        tsne = TSNE(perplexity=10, n_components=2, init='pca')
         return tsne.fit_transform(embeddings)
 
     def plot(self, two_d_embeddings, labels):
