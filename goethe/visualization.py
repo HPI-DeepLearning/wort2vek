@@ -1,14 +1,22 @@
 from sklearn.manifold import TSNE
+from sklearn.decomposition import PCA
 import numpy as np
 import matplotlib.pyplot as plt
 
-class TSNEVisualizer:
+class Visualizer:
     """
     Visualize word embeddings in a two dimensional space using t-SNE.
     """
 
-    def __init__(self, model):
+    tsne = TSNE(perplexity=30, n_components=2, init='pca', n_iter=5000)
+    pca = PCA(n_components=2)
+
+    def __init__(self, model, decomposer=None):
         self.model = model
+        if decomposer is None:
+            self.decomposer = Visualizer.tsne
+        else:
+            self.decomposer = decomposer
 
     def embedding_size(self):
         return seld.model.syn0.shape[1]
@@ -17,8 +25,7 @@ class TSNEVisualizer:
         return self.model[words]
 
     def transform(self, embeddings):
-        tsne = TSNE(perplexity=10, n_components=2, init='pca')
-        return tsne.fit_transform(embeddings)
+        return self.decomposer.fit_transform(embeddings)
 
     def plot(self, two_d_embeddings, labels):
         plt.figure()
