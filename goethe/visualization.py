@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 class Visualizer:
     """
-    Visualize word embeddings in a two dimensional space using t-SNE.
+    Visualize word embeddings in a two dimensional space using t-SNE or PCA.
     """
 
     tsne = TSNE(perplexity=30, n_components=2, init='pca', n_iter=5000)
