@@ -1,16 +1,29 @@
 import os
 import collections
 
+
 class LeipzigCorpus:
     """Iterate over Leipzig Corpus (part of Projekt Deutscher Wortschatz).
     """
 
-    def __init__(self, dirname, lang='deu', corpus_name=None):
+    CORPUS_SENTENCES = 20614679
+
+    def __init__(self, dirname, lang='deu', corpus_name=None, max_sentences=None):
         self.dirname = dirname
         self.lang = lang
         self.corpus_name = corpus_name
+        self._num_sentences = max_sentences or self.CORPUS_SENTENCES
+
+    def __len__(self):
+        return self._num_sentences
 
     def __iter__(self):
+        for i, s in enumerate(self.sentences()):
+            if i >= len(self):
+                raise StopIteration
+            yield s
+
+    def sentences(self):
         """Find all sentence files in 'dirname' and iterate over lines
         returning sentences only (without leading numbers).
 
@@ -40,14 +53,7 @@ class LeipzigCorpus:
                     # Lines are of form: 'LineNumber\tActualSentence\n'
                     yield line.split('\t')[1].strip().split()
 
-    def word_iter(self):
+    def words(self):
         for sentence in self.__iter__():
             for word in sentence:
                 yield word
-
-    def top_n(self, n):
-        return collections.Counter(self.word_iter()).most_common(n)
-
-    def top_n_words(self, n):
-        for (word, _) in self.top_n(n):
-            yield word
