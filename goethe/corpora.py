@@ -1,19 +1,27 @@
 import os
 import collections
-import multiprocessing as mp
 
 
 class LeipzigCorpus:
     """Iterate over Leipzig Corpus (part of Projekt Deutscher Wortschatz).
     """
 
-    LEIPZIG_SENTENCES = 20614679
+    CORPUS_SENTENCES = 20614679
 
     def __init__(self, dirname, lang='deu', corpus_name=None, max_sentences=None):
         self.dirname = dirname
         self.lang = lang
         self.corpus_name = corpus_name
-        self._num_sentences = max_sentences or self.LEIPZIG_SENTENCES
+        self._num_sentences = max_sentences or self.CORPUS_SENTENCES
+
+    def __len__(self):
+        return self._num_sentences
+
+    def __iter__(self):
+        for i, s in enumerate(self.sentences()):
+            if i >= len(self):
+                raise StopIteration
+            yield s
 
     def sentences(self):
         """Find all sentence files in 'dirname' and iterate over lines
@@ -44,15 +52,6 @@ class LeipzigCorpus:
                 for line in open(sentences_file):
                     # Lines are of form: 'LineNumber\tActualSentence\n'
                     yield line.split('\t')[1].strip().split()
-
-    def __len__(self):
-        return self._num_sentences
-
-    def __iter__(self):
-        for i, s in enumerate(self.sentences()):
-            if i >= len(self):
-                raise StopIteration
-            yield s
 
     def words(self):
         for sentence in self.__iter__():
