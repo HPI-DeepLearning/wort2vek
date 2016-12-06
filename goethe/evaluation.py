@@ -74,7 +74,7 @@ def gensim_model_acc(model, questions_file):
 def split_modelname(name):
     parts = name.split('.')[0].split('_')
     n_sentences = int(parts[0].replace('n', ''))
-    vector_size = int(parts[1],replace('size', ''))
+    vector_size = int(parts[1].replace('size', ''))
     epochs = int(parts[2].replace('epochs', ''))
     return n_sentences, vector_size, epochs
 
