@@ -1,12 +1,19 @@
 : Land,Währung
 China,Yuan
 Deutschland,Euro
+Frankreich,Euro
 Dänemark,Krone
-England,Pfund
 Japan,Yen
 Russland,Rubel
 USA,Dollar
-: Hauptstad,Land
+Großbritannien,Pfund
+Kroatien,Kuna
+Südafrika,Rand
+Thailand,Baht
+Indien,Rupien
+Schweiz,Franken
+Türkei,Lira
+: Hauptstadt,Land
 Athen,Griechenland
 Bagdad,Irak
 Bangkok,Thailand
@@ -17,6 +24,7 @@ Helsinki,Finnland
 Kairo,Ägypten
 Kiew,Ukraine
 London,England
+Edinburgh,Schottland
 Madrid,Spanien
 Melbourne,Australien
 Moskau,Russland
@@ -28,24 +36,52 @@ Stockholm,Schweden
 Teheran,Iran
 Tokio,Japan
 Washington,USA
+Kopenhagen,Dänemark
+Wien,Österreich
+Indien,Neu-Delhi
+China,Peking
+Japan,Tokio
+: Bundesland,Landeshauptstadt
+Baden-Württemberg,Stuttgart
+Bayern,München
+Brandenburg,Potsdam
+Hessen,Wiesbaden
+Mecklenburg-Vorpommern,Schwerin
+Niedersachen,Hannover
+Nordrhein-Westfalen,Düsseldorf
+Rheinland-Pfalz,Mainz
+Saarland,Saarbrücken
+Sachsen-Anhalt,Magdeburg
+Schleswig-Holstein,Kiel
+Thüringen,Erfurt
 : Land,Kontinent
 Brasilien,Südamerika
-China,Asien
+Argentinien,Südamerika
+Kolumbien,Südamerika
 Deutschland,Europa
 England,Europa
 Frankreich,Europa
 Griechenland,Europa
-Indien,Asien
 Italien,Europa
-Kanada,Nordamerika
+Spanien,Europa
 Polen,Europa
-USA,Nordamerika
+Indien,Asien
+China,Asien
 Vietnam,Asien
+Japan,Asien
+Israel,Asien
+Kanada,Nordamerika
+USA,Nordamerika
+Mexiko,Nordamerika
 Ägypten,Afrika
-: Land,Sprache
+Somalia,Afrika
+Libyen,Afrika
+Kongo,Afrika
+: Land,Sprache/Adjektiv
 China,Chinesisch
 Deutschland,Deutsch
 England,Englisch
+Großbritannien,Britisch
 Frankreich,Französisch
 Griechenland,Griechisch
 Italien,Italienisch
@@ -57,9 +93,8 @@ Russland,Russisch
 Schweden,Schwedisch
 Spanien,Spanisch
 Ukraine,Ukrainisch
-: Politik
-Elisabeth,Königin
-Charles,Prinz
+USA,Amerikanisch
+Brasilien,Brasilianisch
 : Technik
 Android,Google
 iOS,Apple
@@ -82,3 +117,5 @@ Papa,Mama
 Partner,Partnerin
 Prinz,Prinzessin
 Vater,Mutter
+Lehrer,Lehrerin
+Student,Studentin
