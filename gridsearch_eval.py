@@ -14,8 +14,6 @@ if __name__ == '__main__':
 
     model_names = list([model_name(*params) for params in parameters])
 
-    model_names = ['n500000_size50_epochs3.model']
-
     results = eval_models_from_gridsearch(model_names, 'models', 'evaluation/question-words.txt')
 
     for result, model_name in zip(results, model_names):
