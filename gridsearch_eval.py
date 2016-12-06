@@ -18,4 +18,5 @@ if __name__ == '__main__':
 
     for result, model_name in zip(results, model_names):
         with open(os.path.join('eval-results', model_name + '.json'), 'w+') as f:
+            print('Evaluated model: ' + model_name)
             json.dump(result, f)
