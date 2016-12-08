@@ -6,20 +6,15 @@ class LeipzigCorpus:
     """Iterate over Leipzig Corpus (part of Projekt Deutscher Wortschatz).
     """
 
-    CORPUS_SENTENCES = 20614679
-
     def __init__(self, dirname, lang='deu', corpus_name=None, max_sentences=None):
         self.dirname = dirname
         self.lang = lang
         self.corpus_name = corpus_name
-        self._num_sentences = max_sentences or self.CORPUS_SENTENCES
-
-    def __len__(self):
-        return self._num_sentences
+        self.max_sentences = max_sentences
 
     def __iter__(self):
         for i, s in enumerate(self.sentences()):
-            if i >= len(self):
+            if self.max_sentences and i > self.max_sentences:
                 raise StopIteration
             yield s
 
