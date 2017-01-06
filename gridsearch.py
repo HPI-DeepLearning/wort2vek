@@ -1,32 +1,39 @@
+import time
 import itertools as it
 import multiprocessing as mp
 from goethe.corpora import LeipzigCorpus
 from gensim.models import word2vec
 
-
-model_configurations = {
-    'size': [50, 100, 300, 600],
-    'iter': [3, 5, 10, 20, 50]
+model_config = {
+    'size': [100, 300, 600],
+    'iter': [5, 10, 20],
+    'sg': [0, 1]  # Skip-gram
 }
 
-sample_sizes = [int(n) for n in [500e3, 1e6, 5e6, 10e6, 20e6]]
+sample_sizes = [int(n) for n in [1e6, 3e6, 10e6, 20e6]]
 
 
-def train_model(sample_size, vec_size, epochs):
-    sentences = LeipzigCorpus('data', max_sentences=sample_size)
-    model = word2vec.Word2Vec(sentences=sentences, size=vec_size, iter=epochs)
-    name = 'n{0}_size{1}_epochs{2}'.format(sample_size, vec_size, epochs)
+def train_model(config):
+    sample, size, epochs, sg = config
+    sentences = LeipzigCorpus('data', max_sentences=sample)
+    model = word2vec.Word2Vec(sentences=sentences, size=size, iter=epochs,
+                              workers=4)
+    name = 'n{}_size{}_epochs{}_sg{}'.format(sample, size, epochs, sg)
     return name, model
 
 
-if __name__ == '__main__':
-    parameters = it.product(sample_sizes,
-                            model_configurations['size'],
-                            model_configurations['iter'])
+def minutes(t0):
+    t1 = time.time()
+    return int((t1-t0)/60)
 
-    with mp.Pool() as pool:
-        for name, model in pool.starmap(func=train_model,
-                                        iterable=parameters,
-                                        chunksize=1):
-            model.save('models/' + name + '.model')
-            print('Saved model: ' + name)
+
+if __name__ == '__main__':
+    parameters = it.product(sample_sizes, model_config['size'],
+                            model_config['iter'], model_config['sg'])
+    t0 = time.time()
+    for p in parameters:
+        name, model = train_model(p)
+        model.save('models/' + name + '.model')
+        print('{}\', saved model: {}'.format(minutes(t0), name))
+
+
