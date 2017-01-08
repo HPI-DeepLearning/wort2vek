@@ -1,7 +1,8 @@
 import itertools as it
+from collections import defaultdict
+import random
 
 def tuples_to_sections(in_filename):
-
     # Load file and store pairs grouped by sections
     super_sections = []
     for line in open(in_filename):
@@ -12,7 +13,6 @@ def tuples_to_sections(in_filename):
             })
             continue
         super_sections[-1]['tuples'].append(line.strip().split(','))
-
 
     sections = []
     for super_section in super_sections:
@@ -52,7 +52,6 @@ def sections_to_pairs(sections):
         for t in s['4-tuples']:
             yield ' '.join(t)
 
-
 def quadruples(filename):
     if filename.endswith('.pairs.txt'):
         sections = pairs_to_sections(filename)
@@ -68,6 +67,38 @@ def files_to_quadtruples(in_filenames, out_filename):
     with open(out_filename, 'w') as f:
         f.writelines(l + '\n' for l in lines)
     return out_filename
+
+def filter(questions, n=500):
+    # Build sections
+    sections = defaultdict(list)
+    with open(questions) as f:
+        for l in f.readlines():
+            if ':' in l:
+                sname = l
+            else:
+                sections[sname].append(l)
+
+    # Write out
+    with open(questions, 'w') as f:
+        for sname, lines in sections.items():
+            f.write(sname)
+            # Sample
+            if len(lines) >= n:
+                lines = random.sample(lines, n)
+            f.writelines(lines)
+
+
+def count(questions):
+    sections = defaultdict(int)
+    with open(questions) as f:
+        for l in f.readlines():
+            if ':' in l:
+                sname = l
+            else:
+                sections[sname] += 1
+    return sections
+
+
 
 in_path = 'evaluation/base/'
 out_path = 'evaluation/'
