@@ -18,11 +18,14 @@ sizes = ['3M', '1M', '300K', '100K', '30K', '10K']
 def corpus_name(base, year, size):
     return base.format(year, size)
 
+
 def download_url(corpus_name):
     return url + corpus_name
 
+
 def corpus_path(corpus_name):
     return path + corpus_name
+
 
 def try_download(corpus_name):
     store_path = corpus_path(corpus_name)
@@ -36,6 +39,7 @@ def try_download(corpus_name):
         print("Can't download: " + corpus_name)
         return False, None
 
+
 def download_corpora(base):
     for year in years:
         print('Year: ' + str(year))
@@ -47,9 +51,11 @@ def download_corpora(base):
                 print('Successful downloaded: ' + filename)
                 break
 
+
 def download_corpora_news():
     for base in base_news:
         download_corpora(base)
+
 
 def download_corpora_wiki():
     for base in base_wiki:

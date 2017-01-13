@@ -1,0 +1,7 @@
+cython
+pandas
+numpy
+sklearn
+matplotlib
+gensim
+SPARQLWrapper
