@@ -36,7 +36,7 @@ def gridsearch_evaluation():
             f.writelines([json.dumps(r, ensure_ascii=False) + '\n'
                           for r in results])
 
-        print('({} of {}) '.format(i+1, len(paths)) +
+        print('({} of {}) '.format(i + 1, len(paths)) +
               'Wrote results for n: {n}, size: {size}, epochs: {epochs}, sg: {sg}'.format(**conf))
 
 

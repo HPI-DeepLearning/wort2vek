@@ -5,11 +5,16 @@ class LeipzigCorpus:
     """Iterate over Leipzig Corpus (part of Projekt Deutscher Wortschatz).
     """
 
-    def __init__(self, dir_name, lang='deu', corpus_name=None, max_sentences=None):
+    def __init__(self, dir_name, lang='deu', corpus_name=None,
+                 max_sentences=None, name_filter=None, words=True):
+        """Use 'condition' to filter names, e.g. 'Wikipedia'.
+        """
         self.dir = dir_name
         self.lang = lang
         self.corpus_name = corpus_name
         self.max_sentences = max_sentences
+        self.name_filter = name_filter
+        self.words = words
 
     def __iter__(self):
         for i, s in enumerate(self.sentences()):
@@ -24,7 +29,8 @@ class LeipzigCorpus:
         for f in files:
             for line in open(f):
                 # Lines are of form: 'LineNumber\tActualSentence\n'
-                yield line.split('\t')[1].strip().split()
+                sent = line.split('\t')[1].strip()
+                yield sent.split() if self.words else sent
 
     def sentence_files(self):
         """Find all sentence files in 'dirname'.
@@ -49,6 +55,8 @@ class LeipzigCorpus:
 
             for f in os.listdir(os.path.join(self.dir, corpus)):
                 if not f.endswith('sentences.txt'):
+                    continue
+                if self.name_filter and not self.name_filter(f):
                     continue
                 sentences_file = os.path.join(self.dir, corpus, f)
                 files.append(sentences_file)
