@@ -18,7 +18,7 @@ class LeipzigCorpus:
                 raise StopIteration
             yield s
 
-    def sentences(self):
+    def raw_sentences(self):
         """Find all sentence files in 'dirname' and iterate over lines
         returning sentences only (without leading numbers).
 
@@ -46,7 +46,11 @@ class LeipzigCorpus:
                 sentences_file = os.path.join(self.dirname, corpus, fname)
                 for line in open(sentences_file):
                     # Lines are of form: 'LineNumber\tActualSentence\n'
-                    yield line.split('\t')[1].strip().split()
+                    yield line.split('\t')[1].strip()
+
+    def sentences(self):
+        for s in self.raw_sentences():
+            yield s.split()
 
     def words(self):
         for sentence in self.__iter__():
