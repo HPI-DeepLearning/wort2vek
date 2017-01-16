@@ -1,5 +1,6 @@
 import os
-
+from nltk import word_tokenize
+from keras.preprocessing.text import Tokenizer
 
 class LeipzigCorpus:
     """Iterate over Leipzig Corpus (part of Projekt Deutscher Wortschatz).
@@ -15,12 +16,43 @@ class LeipzigCorpus:
         self.max_sentences = max_sentences
         self.name_filter = name_filter
         self.words = words
+        self.index2word = None
+        self.tokenizer_filter = '"#$%&()*+-/:<=>@[\\]^_`{|}~\t\n'
 
     def __iter__(self):
         for i, s in enumerate(self.sentences()):
             if self.max_sentences and i >= self.max_sentences:
                 break
             yield s
+
+    def build_word_index(self):
+        """Create index that map words to numbers.
+        """
+        tokenizer = Tokenizer(nb_words=None, filters=self.tokenizer_filter, lower=True, split=" ")
+        tokenizer.fit_on_texts(self)
+        self.word2index = tokenizer.word_index
+
+    def delete_word_index(self):
+        """Delete word index built with `build_word_index()`.
+        """
+        self.word2index = None
+
+    def index2word(self):
+        return {index: word for word, index in self.word2index.items()}
+
+    def sentence_numbers(self):
+        for sentence in self.sentences():
+            yield [self.word2index[word] for word in sentence]
+
+    def rolling_window(self, a, window):
+        shape = a.shape[:-1] + (a.shape[-1] - window + 1, window)
+        strides = a.strides + (a.strides[-1],)
+        return np.lib.stride_tricks.as_strided(a, shape=shape, strides=strides)
+
+    def number_ngrams(self, n):
+        for numbers in self.sentence_numbers():
+            for ngram in self.rolling_window(numbers, n):
+                yield ngram
 
     def sentences(self):
         """Iterate over lines in files returning sentences.
@@ -29,8 +61,8 @@ class LeipzigCorpus:
         for f in files:
             for line in open(f):
                 # Lines are of form: 'LineNumber\tActualSentence\n'
-                sent = line.split('\t')[1].strip()
-                yield sent.split() if self.words else sent
+                sent = line.split('\t')[1].strip().lower()
+                yield word_tokenize(sent) if self.words else sent
 
     def sentence_files(self):
         """Find all sentence files in 'dirname'.

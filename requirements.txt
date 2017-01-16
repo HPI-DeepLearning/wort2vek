@@ -4,4 +4,6 @@ numpy
 sklearn
 matplotlib
 gensim
+nltk
+keras
 SPARQLWrapper
