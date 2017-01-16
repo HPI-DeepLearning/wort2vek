@@ -1,6 +1,5 @@
 import os
 from nltk import word_tokenize
-from keras.preprocessing.text import Tokenizer
 
 class LeipzigCorpus:
     """Iterate over Leipzig Corpus (part of Projekt Deutscher Wortschatz).
@@ -16,7 +15,9 @@ class LeipzigCorpus:
         self.max_sentences = max_sentences
         self.name_filter = name_filter
         self.words = words
+        self.has_wordindex = False
         self.index2word = None
+        self.word2index = None
         self.tokenizer_filter = '"#$%&()*+-/:<=>@[\\]^_`{|}~\t\n'
 
     def __iter__(self):
@@ -26,21 +27,21 @@ class LeipzigCorpus:
             yield s
 
     def build_word_index(self):
-        """Create index that map words to numbers.
+        """Create indices that map words to numbers and the other way around.
         """
-        tokenizer = Tokenizer(nb_words=None, filters=self.tokenizer_filter, lower=True, split=" ")
-        tokenizer.fit_on_texts(self)
-        self.word2index = tokenizer.word_index
+        line_words = (word_tokenize(sentence) for sentence in self.sentences())
+        self.index2word = list(Counter(chain.from_iterable(line_words)))
+        self.word2index = {word: index for index, word in enumerate(self.index2word)}
 
     def delete_word_index(self):
-        """Delete word index built with `build_word_index()`.
+        """Delete word indices built with `build_word_index()`.
         """
         self.word2index = None
+        self.index2word = None
 
-    def index2word(self):
-        return {index: word for word, index in self.word2index.items()}
-
-    def sentence_numbers(self):
+    def number_sentences(self):
+        if not self.has_wordindex:
+            self.build_word_index()
         for sentence in self.sentences():
             yield [self.word2index[word] for word in sentence]
 
