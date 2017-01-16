@@ -1,12 +1,15 @@
 import os
 from nltk import word_tokenize
+import numpy as np
+from collections import Counter
+from itertools import chain
 
 class LeipzigCorpus:
     """Iterate over Leipzig Corpus (part of Projekt Deutscher Wortschatz).
     """
 
     def __init__(self, dir_name, lang='deu', corpus_name=None,
-                 max_sentences=None, name_filter=None, words=True):
+                 max_sentences=None, name_filter=None):
         """Use 'condition' to filter names, e.g. 'Wikipedia'.
         """
         self.dir = dir_name
@@ -14,23 +17,15 @@ class LeipzigCorpus:
         self.corpus_name = corpus_name
         self.max_sentences = max_sentences
         self.name_filter = name_filter
-        self.words = words
-        self.has_wordindex = False
         self.index2word = None
         self.word2index = None
-        self.tokenizer_filter = '"#$%&()*+-/:<=>@[\\]^_`{|}~\t\n'
-
-    def __iter__(self):
-        for i, s in enumerate(self.sentences()):
-            if self.max_sentences and i >= self.max_sentences:
-                break
-            yield s
+        self.tokenizer_filter = '"\'#$%&()*+/:<=>@[\\]^_`{|}~\t\n»«„“‹›'
 
     def build_word_index(self):
         """Create indices that map words to numbers and the other way around.
         """
-        line_words = (word_tokenize(sentence) for sentence in self.sentences())
-        self.index2word = list(Counter(chain.from_iterable(line_words)))
+        line_words = self.sentences(words=True)
+        self.index2word = [ word for word, _ in Counter(chain.from_iterable(line_words)).most_common()]
         self.word2index = {word: index for index, word in enumerate(self.index2word)}
 
     def delete_word_index(self):
@@ -39,10 +34,39 @@ class LeipzigCorpus:
         self.word2index = None
         self.index2word = None
 
-    def number_sentences(self):
-        if not self.has_wordindex:
+    def preprocess_and_store(self, directory, log=None):
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        self.store_tokens(os.path.join(directory, 'tokens.txt'), log=log)
+        self.store_numbers(os.path.join(directory, 'numbers.txt'), log=log)
+        self.store_index2word(os.path.join(directory, 'index2word.txt'))
+
+    def store_tokens(self, filename, log=None):
+        with open(filename, 'w') as f:
+            for i, sentence in enumerate(self.sentences(words=True)):
+                if log and i % log == 0:
+                    print("tokens - wrote %d lines" % i)
+                f.write(" ".join(sentence) + '\n')
+
+    def store_numbers(self, filename, log=None):
+        with open(filename, 'w') as f:
+            for i, numbers in enumerate(self.number_sentences()):
+                if log and i % log == 0:
+                    print("numbers - wrote %d lines" % i)
+                f.write(" ".join(map(str, numbers)) + '\n')
+
+    def store_index2word(self, filename):
+        if not self.word2index:
             self.build_word_index()
-        for sentence in self.sentences():
+        with open(filename, 'w') as f:
+            for word in self.index2word:
+                f.write(word + '\n')
+
+    def number_sentences(self):
+        if not self.word2index:
+            self.build_word_index()
+        for sentence in self.sentences(words=True):
             yield [self.word2index[word] for word in sentence]
 
     def rolling_window(self, a, window):
@@ -51,19 +75,26 @@ class LeipzigCorpus:
         return np.lib.stride_tricks.as_strided(a, shape=shape, strides=strides)
 
     def number_ngrams(self, n):
-        for numbers in self.sentence_numbers():
+        for numbers in self.number_sentences():
             for ngram in self.rolling_window(numbers, n):
                 yield ngram
 
-    def sentences(self):
+    def sentences(self, words=True):
         """Iterate over lines in files returning sentences.
         """
         files = self.sentence_files()
+        trans = str.maketrans('', '', self.tokenizer_filter)
         for f in files:
             for line in open(f):
                 # Lines are of form: 'LineNumber\tActualSentence\n'
-                sent = line.split('\t')[1].strip().lower()
-                yield word_tokenize(sent) if self.words else sent
+                sent = line.split('\t')[1].strip().lower().translate(trans)
+                yield word_tokenize(sent) if words else sent
+
+    def sentences_n(self, n):
+        for i, s in enumerate(self.sentences()):
+            if self.max_sentences and i >= n:
+                break
+            yield s
 
     def sentence_files(self):
         """Find all sentence files in 'dirname'.
