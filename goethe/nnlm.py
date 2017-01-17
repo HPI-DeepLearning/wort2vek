@@ -41,7 +41,7 @@ class NNLM:
             y += [triple[-1]]
         return np.array(X), np.array(y)
 
-    def input_output_generator(self, triples, batch_size=32):
+    def train_data_generator(self, triples, batch_size=32):
         while True:
             batch = itertools.islice(triples, batch_size)
             if not batch:
@@ -56,13 +56,17 @@ class NNLM:
         model.add(Dense(self.nb_words(), activation='softmax'))
         return model
 
-    def run_model(self, train_data, model=None, samples_per_epoch=100000, nb_epoch=5):
+    def train(self, train_data_triples, model=None, samples_per_epoch=100000, nb_epoch=5):
         if not model:
             model = self.model(2, 500)
         model.compile(optimizer='rmsprop',
                       loss='sparse_categorical_crossentropy',
                       metrics=['sparse_categorical_accuracy'])
-        model.fit_generator(train_data,
+
+        train_gen = self.train_data_generator(train_data_triples)
+
+        model.fit_generator(train_gen,
                             samples_per_epoch=samples_per_epoch,
                             nb_epoch=nb_epoch,
                             verbose=1)
+        return model

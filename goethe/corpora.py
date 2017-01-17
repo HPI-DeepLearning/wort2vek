@@ -75,7 +75,10 @@ class LeipzigCorpus:
 
     def store_triples(self, filename, log=None):
         with open(filename, 'w') as f:
-            for i, ngram in self.number_ngrams
+            for i, ngram in self.number_ngrams:
+                if log and i % log == 0:
+                    print("triples - wrote %d lines" % i)
+                f.write(" ".join(map(str, ngram)) + "\n")
 
     def store_index2word(self, filename):
         if not self.word2index:
