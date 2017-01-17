@@ -4,6 +4,23 @@ import numpy as np
 from collections import Counter
 from itertools import chain
 
+class LineNumbers:
+    """Iterate over a file of sentences, where each word is represented
+       by a number.
+    """
+
+    def __init__(self, filename):
+        self.filename = filename
+
+    def sentences(self):
+        for line in open(filename):
+            yield map(int, line.split())
+
+    def ngrams(self, n):
+        for numbers in self.sentences():
+            for i in range(0, len(numbers) - n + 1):
+                yield numbers[i:i+n]
+
 class LeipzigCorpus:
     """Iterate over Leipzig Corpus (part of Projekt Deutscher Wortschatz).
     """
@@ -56,6 +73,10 @@ class LeipzigCorpus:
                     print("numbers - wrote %d lines" % i)
                 f.write(" ".join(map(str, numbers)) + '\n')
 
+    def store_triples(self, filename, log=None):
+        with open(filename, 'w') as f:
+            for i, ngram in self.number_ngrams
+
     def store_index2word(self, filename):
         if not self.word2index:
             self.build_word_index()
@@ -76,8 +97,13 @@ class LeipzigCorpus:
 
     def number_ngrams(self, n):
         for numbers in self.number_sentences():
-            for ngram in self.rolling_window(numbers, n):
+            for ngram in self.rolling_window(np.array(numbers), n):
                 yield ngram
+
+    def number_ngrams_(self, n):
+        for numbers in self.number_sentences():
+            for i in range(0, len(numbers) - n + 1):
+                yield numbers[i:i+n]
 
     def sentences(self, words=True):
         """Iterate over lines in files returning sentences.
