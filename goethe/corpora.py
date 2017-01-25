@@ -21,6 +21,18 @@ class LineNumbers:
             for i in range(0, len(numbers) - n + 1):
                 yield numbers[i:i+n]
 
+    def word_index(self, filename, nb_words=None):
+        """ word index starts at 1, 0 is reserved for words with a rank higher
+            than nb_words
+        """
+        with open(filename, 'r') as f:
+            index2word = f.readlines()
+            if nb_words:
+                index2word = index2word[:nb_words]
+            index2word = ['unknown'] + index2word
+            word2index = {word: index for index, word in enumerate(index2word)}
+        return index2word, word2index
+
 class LeipzigCorpus:
     """Iterate over Leipzig Corpus (part of Projekt Deutscher Wortschatz).
     """

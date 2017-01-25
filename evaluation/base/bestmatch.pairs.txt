@@ -95,17 +95,25 @@ Spanien,Spanisch
 Ukraine,Ukrainisch
 USA,Amerikanisch
 Brasilien,Brasilianisch
-: Technik
+Italien,Italienisch
+Griechenland,Griechisch
+Türkei,Türkisch
+Niederlande,Niederländisch
+: Technik - Produkte
 Android,Google
 iOS,Apple
 Windows,Microsoft
+: Technik - Browser
+Chrome,Google
+Explorer,Microsoft
+Firefox,Mozilla
+Safari,Apple
 : Geschlecht
 Bruder,Schwester
 Bräutigam,Braut
 Ehemann,Ehefrau
 Enkel,Enkelin
 er,sie
-Er,Sie
 Großvater,Großmutter
 Junge,Mädchen
 König,Königin
