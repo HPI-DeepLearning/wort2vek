@@ -9,11 +9,11 @@ class LineNumbers:
        by a number.
     """
 
-    def __init__(self, filename):
+    def __init__(self, filename):s
         self.filename = filename
 
     def sentences(self):
-        for line in open(filename):
+        for line in open(self.filename):
             yield map(int, line.split())
 
     def ngrams(self, n):
