@@ -22,7 +22,7 @@ class TrainingData(object):
     def build_indices(self):
         self.count = [[TrainingData.UNKNOWN_TOKEN, -1]]
 
-        counter = Counter(chain.from_iterable(self.corpus.sentences(words=True)))
+        counter = Counter(chain.from_iterable(self.corpus.sentences()))
 
         if self.nb_words:
             common_counts = counter.most_common(self.nb_words - 1)
@@ -36,7 +36,7 @@ class TrainingData(object):
             self.word2index[word] = len(self.word2index)
 
         unk_count = 0
-        for sentence in self.corpus.sentences(words=True):
+        for sentence in self.corpus.sentences():
             for word in sentence:
                 if word not in self.word2index:
                     unk_count = unk_count + 1
@@ -45,7 +45,7 @@ class TrainingData(object):
         self.index2word = dict(zip(self.word2index.values(), self.word2index.keys()))
 
     def sentence_dataset(self):
-        for sentence in self.corpus.sentences(words=True):
+        for sentence in self.corpus.sentences():
             numbers = list()
             for word in sentence:
                 if word in self.word2index:
