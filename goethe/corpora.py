@@ -9,7 +9,7 @@ class LineNumbers:
        by a number.
     """
 
-    def __init__(self, filename):s
+    def __init__(self, filename):
         self.filename = filename
 
     def sentences(self):
