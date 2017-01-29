@@ -46,6 +46,7 @@ class Corpus:
         """Randomly select a list of k elements from either tokens or sents.
         (Will load k elements into memory!)
         """
-        iterator = (self if use_tokens is None
-                    else (self.tokens if use_tokens else self.sents))
+        iterator = (self
+                    if use_tokens is None
+                    else (self.tokens() if use_tokens else self.sents()))
         return util.rsample(iterator, k)
