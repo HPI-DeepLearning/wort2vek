@@ -14,7 +14,7 @@ class Cleaner:
         """
         raise NotImplementedError
 
-    def write(self, path=None, delete=False):
+    def write(self, write_path, delete=False):
         """For a path 'corpus.txt' write:
             corpus/
                 corpus.txt
@@ -23,7 +23,7 @@ class Cleaner:
         Where 'corpus.txt' is one sent per line, spaces left in place,
         and 'corpus.tokens.txt' is one sent per line, token separated by space.
         """
-        folder, file, tokens = self._write_paths(path or self.path)
+        folder, file, tokens = self._write_paths(write_path)
         # Create corpus folder
         os.makedirs(folder, exist_ok=True)
         # Write sentence file
