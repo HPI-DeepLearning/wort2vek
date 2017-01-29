@@ -1,5 +1,5 @@
 import os
-import random
+from . import util
 
 
 class Corpus:
@@ -43,21 +43,9 @@ class Corpus:
         return os.path.join(self.path, file)
 
     def random(self, k, use_tokens=None):
-        """Reservoir sample k elements from either sentences or tokens.
-        Load and shuffle k elements in memory!
-
-        http://propersubset.com/2010/04/choosing-random-elements.html
+        """Randomly select a list of k elements from either tokens or sents.
+        (Will load k elements into memory!)
         """
         iterator = (self if use_tokens is None
                     else (self.tokens if use_tokens else self.sents))
-        sample = []
-        for n, item in enumerate(iterator):
-            if len(sample) < k:
-                sample.append(item)
-            else:
-                r = random.randint(0, n)
-                if r < k:
-                    sample[r] = item
-
-        random.shuffle(sample)
-        return sample
+        return util.rsample(iterator, k)
