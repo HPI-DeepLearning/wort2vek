@@ -1,13 +1,15 @@
 import os
-
 import spacy
 
 LANG = 'de'
+BATCH_SIZE = 10000
+N_THREADS = 4
 
 
 class Cleaner:
     def __init__(self, path):
         self.path = path
+        self._nlp = None
 
     def __iter__(self):
         """Return iterator of cleaned sentences.
@@ -15,12 +17,11 @@ class Cleaner:
         raise NotImplementedError
 
     def write(self, write_path, delete=False):
-        """For a path 'corpus.txt' write:
-            corpus/
+        """For a path 'pat/to/corpus' write:
+            path/to/corpus/
                 corpus.txt
                 corpus.tokens.txt
-
-        Where 'corpus.txt' is one sent per line, spaces left in place,
+        where 'corpus.txt' is one sent per line, spaces left in place,
         and 'corpus.tokens.txt' is one sent per line, token separated by space.
         """
         folder, file, tokens = self._write_paths(write_path)
@@ -31,9 +32,8 @@ class Cleaner:
             for line in self:
                 f.write('%s\n' % line)
         # Write tokens file
-        nlp = spacy.load(LANG)
-        with open(file, 'w') as f:
-            for doc in nlp.tokenizer.pipe(self):
+        with open(tokens, 'w') as f:
+            for doc in self.nlp.tokenizer.pipe(self, batch_size=BATCH_SIZE, n_threads=N_THREADS):
                 token_line = ' '.join(str(token) for token in doc)
                 f.write('%s\n' % token_line)
 
@@ -44,10 +44,15 @@ class Cleaner:
             elif os.path.isdir(self.path):
                 os.rmdir(self.path)
 
+    @property
+    def nlp(self):
+        if not self._nlp:
+            self._nlp = spacy.load(LANG)
+        return self._nlp
+
     @staticmethod
     def _write_paths(path):
         """Return write paths for folder, file, and tokens.
-
         Example for input 'abc/def.txt':
             'abc/def', 'abc/def/def.txt', 'abc/def/def.tokens.txt'
         """
