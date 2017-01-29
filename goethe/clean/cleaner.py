@@ -52,6 +52,6 @@ class Cleaner:
         # Example: abc/def.txt
         name = os.path.splitext(os.path.basename(path))[0]  # def
         folder = os.path.splitext(path)[0]  # abc/def/
-        file = f'{name}.txt'  # abc/def.txt
-        tokens = f'{name}.tokens.txt'  # abc/def.tokens.txt
+        file = '%s.txt' % name  # abc/def.txt
+        tokens = '%s.tokens.txt' % name  # abc/def.tokens.txt
         return folder, os.path.join(folder, file), os.path.join(folder, tokens)
