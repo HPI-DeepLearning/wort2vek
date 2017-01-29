@@ -15,9 +15,8 @@ class Corpus:
     def __iter__(self):
         """Return generator yielding either tokens or sentences.
         """
-        return self.tokens if self.use_tokens else self.sents
+        return self.tokens() if self.use_tokens else self.sents()
 
-    @property
     def sents(self):
         """Yield sentences from file.
         """
@@ -25,7 +24,6 @@ class Corpus:
         with open(path) as f:
             yield from (l.strip() for l in f)
 
-    @property
     def tokens(self):
         """Yield from file a list of tokens per sentence.
         """
@@ -50,8 +48,8 @@ class Corpus:
 
         http://propersubset.com/2010/04/choosing-random-elements.html
         """
-        iterator = self if use_tokens is None \
-            else (self.tokens if use_tokens else self.sents)
+        iterator = (self if use_tokens is None
+                    else (self.tokens if use_tokens else self.sents))
         sample = []
         for n, item in enumerate(iterator):
             if len(sample) < k:
