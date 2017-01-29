@@ -20,8 +20,8 @@ class Cleaner:
                 corpus.txt
                 corpus.tokens.txt
 
-        Where 'corpus.txt' is one se per line, spaces left in place
-        and 'corpus.tokens.txt' is one sent per
+        Where 'corpus.txt' is one sent per line, spaces left in place,
+        and 'corpus.tokens.txt' is one sent per line, token separated by space.
         """
         folder, file, tokens = self._write_paths(path or self.path)
         # Create corpus folder
@@ -32,7 +32,8 @@ class Cleaner:
         # Write tokens file
         nlp = spacy.load(LANG)
         with open(file, 'w') as f:
-            f.writelines('%s\n' % l for l in nlp.pipe(self))
+            f.writelines(' '.join(str(token) for token in doc) + '\n'
+                         for doc in nlp.pipe(self))
 
         # Remove uncleaned data
         if delete:
