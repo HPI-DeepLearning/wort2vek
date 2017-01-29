@@ -27,13 +27,15 @@ class Cleaner:
         folder, file, tokens = self._write_paths(write_path)
         # Create corpus folder
         os.makedirs(folder, exist_ok=True)
+
         # Write sentence file
         with open(file, 'w') as f:
             for line in self:
                 f.write('%s\n' % line)
+
         # Write tokens file
         with open(tokens, 'w') as f:
-            for doc in self.nlp.tokenizer.pipe(self, batch_size=BATCH_SIZE, n_threads=N_THREADS):
+            for doc in self.tokenized_sents():
                 token_line = ' '.join(str(token) for token in doc)
                 f.write('%s\n' % token_line)
 
@@ -43,6 +45,18 @@ class Cleaner:
                 os.remove(self.path)
             elif os.path.isdir(self.path):
                 os.rmdir(self.path)
+
+    def tokenized_sents(self):
+        """Return an iterator with SpaCy docs.
+        The docs' tokens can be iterated:
+        Example:
+            [token
+             for doc in self.tokenized_sents()
+             for token in doc]
+        """
+        return self.nlp.tokenizer.pipe(self,
+                                       batch_size=BATCH_SIZE,
+                                       n_threads=N_THREADS)
 
     @property
     def nlp(self):
