@@ -28,12 +28,14 @@ class Cleaner:
         os.makedirs(folder, exist_ok=True)
         # Write sentence file
         with open(file, 'w') as f:
-            f.writelines('%s\n' % l for l in self)
+            for line in self:
+                f.write('%s\n' % line)
         # Write tokens file
         nlp = spacy.load(LANG)
         with open(file, 'w') as f:
-            f.writelines(' '.join(str(token) for token in doc) + '\n'
-                         for doc in nlp.pipe(self))
+            for doc in nlp.tokenizer.pipe(self):
+                token_line = ' '.join(str(token) for token in doc)
+                f.write('%s\n' % token_line)
 
         # Remove uncleaned data
         if delete:
