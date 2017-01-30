@@ -19,9 +19,9 @@ def tuples_to_sections(in_filename):
         (name, subnames) = super_section['name'].split('-')
         subnames = subnames.strip().split(',')
         count = len(subnames)
-        for i, j in it.combinations(range(0, count), 2):
-            section_name = name + ' - ' + subnames[i] + ', ' + subnames[j]
-            pairs = [(t[i], t[j]) for t in super_section['tuples']]
+        for i in range(1, count):
+            section_name = name.strip() + ' - ' + subnames[0] + ', ' + subnames[i]
+            pairs = [(t[0],t[i]) for t in super_section['tuples'] if len(t) > i]
             sections.append({ 'name': section_name, 'pairs': list(pairs) })
 
     return sections
@@ -39,11 +39,17 @@ def pairs_to_sections(in_filename):
         sections[-1]['pairs'].append(line.strip().split(','))
     return sections
 
+def all_pairs(l):
+    for e1 in l:
+        for e2 in l:
+            if e1 != e2:
+                yield (e1, e2)
+
 def sections_to_pairs(sections):
     # For each sections generate 4-tuples
     for section in sections:
         section['4-tuples'] = [list(it.chain(*c)) for c
-                               in it.combinations(section['pairs'], 2)]
+                               in all_pairs(section['pairs'])]
         del section['pairs']
 
     # Create 4-tuples
@@ -103,11 +109,21 @@ def count(questions):
 in_path = 'evaluation/base/'
 out_path = 'evaluation/'
 
-def create_all():
-    files = ['bestmatch.pairs.txt', 'nouns.pairs.txt', 'opposite.pairs.txt', 'adjectives.tuples.txt', 'verbs.tuples.txt']
-    file_paths = [in_path + f for f in files]
-    out_file = out_path + 'question-words.txt'
+def create(in_files, out_file):
+    file_paths = [in_path + f for f in in_files]
+    out_file = out_path + out_file
     files_to_quadtruples(file_paths, out_file)
+
+def create_all():
+    files =[
+        'semantic.pairs.txt',
+        'gender.pairs.txt',
+        'grammatical-number.pairs.txt',
+        'opposite.pairs.txt',
+        'adjectives.tuples.txt',
+        'verbs.tuples.txt'
+    ]
+    create(files, 'question-words.txt')
 
 if __name__ == '__main__':
     create_all()
