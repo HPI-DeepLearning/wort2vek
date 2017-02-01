@@ -29,7 +29,7 @@ class Corpus:
         """
         path = self.file_path(use_tokens=True)
         with open(path) as f:
-            tokens = [line.strip().split() for line in f]
+            tokens = (line.strip().split() for line in f)
             yield from limit_iter(tokens) if self.limit else tokens
 
     def limit_iter(self, iterator):
