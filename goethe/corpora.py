@@ -1,21 +1,21 @@
 import os
 from . import util
-
+import itertools as it
 
 class Corpus:
-    def __init__(self, path, use_tokens=True):
+    def __init__(self, path, limit=None):
         """Pass path to corpus. Expects following structure:
         path/to/my/corpus
             corpus.txt
             corpus.tokens.txt
         """
         self.path = os.path.normpath(path)
-        self.use_tokens = use_tokens
+        self.limit = limit
 
     def __iter__(self):
-        """Return generator yielding either tokens or sentences.
+        """Return generator yielding tokens.
         """
-        return self.tokens() if self.use_tokens else self.sents()
+        return self.tokens()
 
     def sents(self):
         """Yield sentences from file.
@@ -29,7 +29,14 @@ class Corpus:
         """
         path = self.file_path(use_tokens=True)
         with open(path) as f:
-            yield from (l.strip().split() for l in f)
+            tokens = [line.strip().split() for line in f]
+            yield from limit_iter(tokens) if self.limit else tokens
+
+    def limit_iter(self, iterator):
+        """Return iterator that yields self.limit elements of the passed
+           iterator.
+        """
+        return it.islice(iterator, self.limit)
 
     def file_path(self, use_tokens):
         """Return path to either sentence or token file.
@@ -42,11 +49,8 @@ class Corpus:
         file = ('%s.tokens.txt' if use_tokens else '%s.txt') % corpus_name
         return os.path.join(self.path, file)
 
-    def random(self, k, use_tokens=None):
-        """Randomly select a list of k elements from either tokens or sents.
+    def random(self, k):
+        """Randomly select a list of k token lists.
         (Will load k elements into memory!)
         """
-        iterator = (self
-                    if use_tokens is None
-                    else (self.tokens() if use_tokens else self.sents()))
-        return util.rsample(iterator, k)
+        return util.rsample(self.tokens(), k)
