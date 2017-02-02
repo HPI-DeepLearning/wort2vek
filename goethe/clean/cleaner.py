@@ -28,16 +28,12 @@ class Cleaner:
         # Create corpus folder
         os.makedirs(folder, exist_ok=True)
 
-        # Write sentence file
-        with open(file, 'w') as f:
-            for line in self:
-                f.write('%s\n' % line)
-
-        # Write tokens file
-        with open(tokens, 'w') as f:
+        # Write tokens and sentences files
+        with open(file, 'w') as f_sents, open(tokens, 'w') as f_tokens:
             for doc in self.tokenized_sents():
-                token_line = ' '.join(str(token) for token in doc)
-                f.write('%s\n' % token_line)
+                for sent_doc in doc.sents:
+                    self.write_sentence(f_sents, sent_doc.string)
+                    self.write_tokens(f_tokens, sent_doc)
 
         # Remove uncleaned data
         if delete:
@@ -45,6 +41,13 @@ class Cleaner:
                 os.remove(self.path)
             elif os.path.isdir(self.path):
                 os.rmdir(self.path)
+
+    def write_sentence(self, file, sentence):
+        file.write('%s\n' % line.strip())
+
+    def write_tokens(self, file, tokens):
+        token_line = ' '.join(str(token) for token in tokens)
+        file.write('%s\n' % token_line)
 
     def tokenized_sents(self):
         """Return an iterator with SpaCy docs.

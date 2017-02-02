@@ -18,4 +18,4 @@ class WikipediaCleaner(Cleaner):
         """
         for line in open(self.path):
             if len(line.split()) >= self.min_length:
-                yield line
+                yield line.strip()
