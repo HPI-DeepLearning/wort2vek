@@ -43,7 +43,7 @@ class Cleaner:
                 os.rmdir(self.path)
 
     def write_sentence(self, file, sentence):
-        file.write('%s\n' % line.strip())
+        file.write('%s\n' % sentence.strip())
 
     def write_tokens(self, file, tokens):
         token_line = ' '.join(str(token) for token in tokens)
@@ -57,9 +57,9 @@ class Cleaner:
              for doc in self.tokenized_sents()
              for token in doc]
         """
-        return self.nlp.tokenizer.pipe(self,
-                                       batch_size=BATCH_SIZE,
-                                       n_threads=N_THREADS)
+        return self.nlp.pipe(self,
+                             batch_size=BATCH_SIZE,
+                             n_threads=N_THREADS)
 
     @property
     def nlp(self):
