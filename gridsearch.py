@@ -27,7 +27,7 @@ def minutes(t0):
 
 
 if __name__ == '__main__':
-    parameters = it.product(model_config['size'], model_config['window']
+    parameters = it.product(model_config['size'], model_config['window'],
                             model_config['sg'])
     t0 = time.time()
     for p in parameters:
