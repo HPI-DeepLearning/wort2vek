@@ -14,7 +14,7 @@ epochs = 10
 
 def train_model(config):
     size, window, sg = config
-    sentences = Corpus('../corpora/eval/eval.tokens.txt', limit=sample_size)
+    sentences = Corpus('../corpora/eval', limit=sample_size)
     model = word2vec.Word2Vec(sentences=sentences, size=size, window=window,
                               iter=epochs, workers=4)
     name = 'n{}_size{}_epochs{}_sg{}_window{}'.format(sample_size, size, epochs, sg, window)
