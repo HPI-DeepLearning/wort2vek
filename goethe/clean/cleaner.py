@@ -14,7 +14,7 @@ class Cleaner:
     def __iter__(self):
         """Return iterator of cleaned sentences.
         """
-        raise NotImplementedError
+        yield from (line.strip() for line in open(self.path))
 
     def write(self, write_path, delete=False):
         """For a path 'pat/to/corpus' write:
