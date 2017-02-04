@@ -67,10 +67,11 @@ class Cleaner:
     @staticmethod
     def _write_paths(path):
         """Return write paths for folder, file, and tokens.
-        Example for input 'abc/def.txt':
+        Example for input 'abc/def/':
             'abc/def', 'abc/def/def.txt', 'abc/def/def.tokens.txt'
         """
-        # Example: abc/def.txt
+        # Example: abc/def/
+        path = os.path.normpath(path)  # abc/def
         name = os.path.splitext(os.path.basename(path))[0]  # def
         folder = os.path.splitext(path)[0]  # abc/def/
         file = '%s.txt' % name  # abc/def.txt
