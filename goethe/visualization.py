@@ -18,7 +18,7 @@ class Visualizer:
             self.decomposer = decomposer
 
     def embedding_size(self):
-        return self.model.syn0.shape[1]
+        return self.model.vector_size
 
     def get_embeddings(self, words):
         return self.model[words]
