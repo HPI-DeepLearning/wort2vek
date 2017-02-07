@@ -188,9 +188,10 @@ class NNLM(object):
         for batch in self.train_data.batches(batch_size, is_train):
             yield self.split_batch(batch)
 
-    def train(self, epochs=1, batch_size=32):
-        model = self.model()
-        self.compile_model(model)
+    def train(self, epochs=1, batch_size=32, model=None):
+        if not model:
+            model = self.model()
+            self.compile_model(model)
         model.fit_generator(self.batches(batch_size),
                             samples_per_epoch=self.train_data.n_samples(),
                             nb_epoch=epochs,
