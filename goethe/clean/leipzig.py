@@ -3,6 +3,9 @@ from .cleaner import Cleaner
 
 
 class LeipzigCleaner(Cleaner):
+    """Path should contain the data in files whose names contain `-sentences`.
+       These files can be located in any subdirectory of the given path.
+    """
     def __iter__(self):
         """Return iterator of cleaned sentences.
         """

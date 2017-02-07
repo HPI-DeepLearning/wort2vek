@@ -7,25 +7,54 @@ import numpy as np
 import itertools
 from itertools import chain
 from collections import Counter
+from .corpora import Corpus
+import os
+import random
 
 class TrainingData(object):
+    UNKNOWN_TOKEN = 'unk'
+    TRAIN_PROB = 0.8
 
-    UNKNOWN_TOKEN = "unk"
-
-    def __init__(self, corpus, restrict_vocab=None):
+    def __init__(self, corpus, restrict_vocab=None, ):
         self.corpus = corpus
         self.nb_words = restrict_vocab
-
         self.count = None
         self.word2index = None
         self.index2word = None
         self.build_indices()
+        self.maybe_split_corpus()
 
-    def __len__(self):
+    @property
+    def fn_train(self):
+        path, ext = os.path.splitext(self.corpus.file_path(use_tokens=True))
+        return path + '.train' + ext
+
+    @property
+    def fn_test(self):
+        path, ext = os.path.splitext(self.corpus.file_path(use_tokens=True))
+        return path + '.test' + ext
+
+    @property
+    def voc_size(self):
         return len(self.word2index)
 
+    @classmethod
+    def from_path(cls, path, restrict_vocab=None):
+        corpus = Corpus(path)
+        return cls(corpus, restrict_vocab=restrict_vocab)
+
+    def maybe_split_corpus(self):
+        if not os.path.isfile(self.fn_train):
+            with open(self.fn_train, 'w') as f_train, \
+                  open(self.fn_test, 'w') as f_test:
+                for line in self.corpus.token_lines():
+                    if random.uniform(0,1) < self.TRAIN_PROB:
+                        f_train.write(line)
+                    else:
+                        f_test.write(line)
+
     def build_indices(self):
-        self.count = [[TrainingData.UNKNOWN_TOKEN, -1]]
+        self.count = [[self.UNKNOWN_TOKEN, -1]]
 
         counter = Counter(chain.from_iterable(self.corpus))
 
@@ -49,67 +78,87 @@ class TrainingData(object):
 
         self.index2word = dict(zip(self.word2index.values(), self.word2index.keys()))
 
-    def number_sentences(self):
-        for sentence in self.corpus:
-            numbers = list()
-            for word in sentence:
-                if word in self.word2index:
-                    index = self.word2index[word]
-                else:
-                    index = 0  # dictionary[UNKNOWN_TOKEN]
-                numbers.append(index)
-            yield numbers
+    def in_vocab(self, word):
+        return word in self.word2index
 
-    def dataset(self):
-        """Return generator of training data
+    def sentence_to_numbers(self, sentence):
+        numbers = list()
+        for word in sentence:
+            if self.in_vocab(word):
+                index = self.word2index[word]
+            else:
+                index = 0  # dictionary[UNKNOWN_TOKEN]
+            numbers.append(index)
+        return numbers
+
+    def numbers_to_sentence(self, numbers):
+        return [self.index2word[index] for index in numbers]
+
+    def tokens(self, is_train):
+        path = self.fn_train if is_train else self.fn_test
+        with open(path) as f:
+            yield from (line.strip().split() for line in f)
+
+    def dataset(self, is_train):
+        """Return iterator of arrays of numbers representing words, accoring to
+           word2index. The numbers can be transformed to words with index2word.
         """
-        raise NotImplementedError("Subclass responsibility")
+        for sentence in self.tokens(is_train):
+            yield self.sentence_to_numbers(sentence)
 
-    def batches(self, data, batch_size):
+    def n_samples(self, is_train=True):
+        path = self.fn_train if is_train else self.fn_test
+        length = 0
+        with open(path) as f:
+            for _ in f:
+                length += 1
+        return length
+
+    def batches(self, batch_size, is_train=True):
         """Return generator of training batches
         """
-        data = self.dataset()
-        while True:
-            batch_data = itertools.islice(data, batch_size)
-            if not batch_data:
-                return
-            yield batch_data
+        batch = []
 
+        for item in self.dataset(is_train):
+            if len(batch) == batch_size:
+                yield batch
+                batch = []
+            batch.append(item)
+
+        if len(batch):
+            yield batch
 
 class NgramTrainingData(TrainingData):
-
     def __init__(self, corpus, n, restrict_vocab=None):
         super().__init__(corpus, restrict_vocab)
         self.n = n
 
-    def dataset(self):
-        for numbers in self.number_sentences():
-            for i in range(0, len(numbers) - n + 1):
-                yield numbers[i:i+n]
+    @classmethod
+    def from_path(cls, path, n, limit=None, restrict_vocab=None):
+        corpus = Corpus(path, limit=limit)
+        return cls(corpus, n, restrict_vocab=restrict_vocab)
 
-
-class SentenceTrainingData(TrainingData):
-
-    def dataset(self):
-        return self.number_sentences()
+    def dataset(self, is_train):
+        for numbers in super().dataset(is_train):
+            for i in range(0, len(numbers) - self.n + 1):
+                yield numbers[i:i+self.n]
 
 
 class SentencePartTrainingData(TrainingData):
-
-    def dataset(self):
-        for sentence in self.number_sentences():
+    def dataset(self, is_train):
+        for sentence in super().dataset(is_train):
             for i in range(0,len(sentence)):
                 yield sentence[:i], sentence[i]
 
 
 class NNLM(object):
-
-    def __init__(self, train_data):
+    def __init__(self, train_data, word2vec):
         self.train_data = train_data
+        self.word2vec = word2vec
 
     @property
     def voc_size(self):
-        return len(self.train_data)
+        return self.train_data.voc_size
 
     @property
     def vector_size(self):
@@ -126,42 +175,57 @@ class NNLM(object):
 
         return embedding
 
-    def embedding_layer(self, n_inputs):
+    def embedding_layer(self, n_inputs, mask_zero=True):
         return Embedding(self.voc_size + 1,
                          self.vector_size,
                          weights=[self.embedding_matrix()],
                          input_length=n_inputs,
+                         mask_zero=mask_zero,
                          trainable=False)
 
-    def batches(self, batch_size=32):
-        for batch in self.training_data.batches(batch_size):
+    def batches(self, batch_size, is_train=True):
+        for batch in self.train_data.batches(batch_size, is_train):
             yield self.split_batch(batch)
 
-    def train(self, batch_size=32, epochs=1):
+    def train(self, epochs=1, batch_size=32):
         model = self.model()
         self.compile_model(model)
-        for i in range(0, epochs):
-            print("Running Epoch: %d" % i)
-            model.fit_generator(self.batches(batch_size), verbose=1)
+        model.fit_generator(self.batches(batch_size),
+                            samples_per_epoch=self.train_data.n_samples(),
+                            nb_epoch=epochs,
+                            verbose=1,
+                            nb_worker=4,
+                            pickle_safe=True)
         return model
 
+    def test(self, model, batch_size=32):
+        return model.evaluate_generator(
+            self.batches(batch_size, is_train=False),
+            self.train_data.n_samples(is_train=False))
+
+    def predict(self, model, sentence):
+        raise NotImplementedError
+
     def model(self):
-        raise NotImplementedError("Subclass responsibility")
+        raise NotImplementedError
 
     def compile_model(self, model):
-        raise NotImplementedError("Subclass responsibility")
+        raise NotImplementedError
 
-    def split_batch(self):
-        raise NotImplementedError("Subclass responsibility")
+    def split_batch(self, data):
+        raise NotImplementedError
 
 
 class NgramNNLM(NNLM):
 
-    def __init__(self, train_data):
-        super().__init__(train_data)
-        self.n_hidden = 500
+    HIDDEN_PER_INPUT = 400
 
-    def split_batch(self, triples):
+    def __init__(self, train_data, word2vec):
+        super().__init__(train_data, word2vec)
+        self.n_hidden = self.HIDDEN_PER_INPUT * (self.train_data.n - 1)
+
+    @staticmethod
+    def split_batch(triples):
         X = []
         y = []
         for triple in triples:
@@ -171,79 +235,99 @@ class NgramNNLM(NNLM):
 
     def model(self):
         model = Sequential()
-        model.add(self.embedding_layer(self.train_data.n))
+        model.add(self.embedding_layer(self.train_data.n - 1, mask_zero=False))
         model.add(Flatten())
         model.add(Dense(self.n_hidden, activation='relu'))
         model.add(Dense(self.voc_size, activation='softmax'))
         return model
 
-    def compile_model(self, model):
-        model.compile(optimizer='sgd',
+    @staticmethod
+    def compile_model(model):
+        model.compile(optimizer='adam',
                       loss='sparse_categorical_crossentropy',
                       metrics=['sparse_categorical_accuracy'])
 
+    def predict(self, model, sentence):
+        numbers = self.train_data.sentence_to_numbers(sentence)
+        n = self.train_data.n
+        last = numbers[-(n-1):]
+        prediction = model.predict(np.asarray([last]))
+        idx = np.argmax(prediction)
+        return self.train_data.index2word[idx]
+
 
 class RnnNNLM(NNLM):
-    def __init__(self, train_data, max_sequence_length=40):
-        super().__init__(train_data)
+    def __init__(self, train_data, word2vec, max_sequence_length=50):
+        super().__init__(train_data, word2vec)
         self.n_inputs = max_sequence_length
-        self.n_hidden = 300
+        self.n_hidden = 400
 
     def model(self):
         model = Sequential()
-        # TODO set mask_zero=True, ensure that there are no 0s in the vocab before
-        model.add(self.embedding_layer(n_inputs))
+        model.add(self.embedding_layer(self.n_inputs))
         model.add(LSTM(self.n_hidden, input_length=self.n_inputs, return_sequences=True))
         model.add(TimeDistributed(Dense(output_dim=self.voc_size, input_dim=self.n_hidden)))
         model.add(Activation('softmax'))
         return model
 
-    def compile_model(self, model):
+    def predict(self, model, sentence):
+        numbers = self.train_data.sentence_to_numbers(sentence)
+        padded = pad_sequences([numbers], self.n_inputs, padding='post')
+        predictions = model.predict(np.asarray(padded))
+        nums = [np.argmax(pred) for pred in predictions[0]]
+        return self.train_data.numbers_to_sentence(nums)
+
+    @staticmethod
+    def compile_model(model):
         model.compile(optimizer='adam',
                       loss='sparse_categorical_crossentropy',
                       metrics=['sparse_categorical_accuracy'])
 
-    def split_data(self, sentences):
+    def split_batch(self, sentences):
         X = list()
         y = list()
         for sentence in sentences:
-            X.append(sentence)
+            X.append(sentence[:-1])
             y.append(sentence[1:])
-        X = np.asarray(pad_sequences(X, maxlen=self.n_inputs), dtype='int32')
-        y = np.asarray(pad_sequences(X, maxlen=self.n_inputs), dtype='int32')
+        X = pad_sequences(X, maxlen=self.n_inputs, padding='post')
+        y = pad_sequences(y, maxlen=self.n_inputs, padding='post')
+        X = np.asarray(X, dtype='int32')
+        y = np.asarray(y, dtype='int32')
         y = np.expand_dims(y, -1)
         return X, y
 
 
 class SentencePartRnnNNLM(NNLM):
-    def __init__(self, train_data, max_sequence_length=40):
-        super().__init__(train_data)
+    def __init__(self, train_data, word2vec, max_sequence_length=50):
+        super().__init__(train_data, word2vec)
         self.n_inputs = max_sequence_length
-        self.model = self.model()
-        self.n_hidden = 200
+        self.n_hidden = 400
 
     def model(self):
         model = Sequential()
-        model.add(self.embedding_layer(n_inputs))
+        model.add(self.embedding_layer(self.n_inputs))
         model.add(LSTM(self.n_hidden))
         model.add(Dense(self.voc_size, activation='softmax'))
         return model
 
-    def compile_model(self, model):
+    @staticmethod
+    def compile_model(model):
         model.compile(optimizer='adam',
                       loss='sparse_categorical_crossentropy',
                       metrics=['sparse_categorical_accuracy'])
 
-    def sentence_parts(self, sentences):
-        for sentence in sentences:
-            for i in range(0,len(sentence)):
-                yield sentence[:i], sentence[i]
+    def predict(self, model, sentence):
+        numbers = self.train_data.sentence_to_numbers(sentence)
+        padded = pad_sequences([numbers], self.n_inputs, padding='post')
+        prediction = model.predict(np.asarray(padded))
+        idx = np.argmax(prediction)
+        return self.train_data.index2word[idx]
 
-    def split_data(self, parts):
+    def split_batch(self, parts):
         X = list()
         y = list()
         for part in parts:
             X.append(part[0])
             y.append(part[1])
-        X_pad = pad_sequences(X, maxlen=self.n_inputs)
+        X_pad = pad_sequences(X, maxlen=self.n_inputs, padding='post')
         return np.asarray(X_pad, dtype='int32'), np.asarray(y, dtype='int32')

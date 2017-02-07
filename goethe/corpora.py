@@ -24,13 +24,16 @@ class Corpus:
         with open(path) as f:
             yield from (l.strip() for l in f)
 
+    def token_lines(self):
+        path = self.file_path(use_tokens=True)
+        with open(path) as f:
+            yield from (line for line in f)
+
     def tokens(self):
         """Yield from file a list of tokens per sentence.
         """
-        path = self.file_path(use_tokens=True)
-        with open(path) as f:
-            tokens = (line.strip().split() for line in f)
-            yield from self.limit_iter(tokens) if self.limit else tokens
+        tokens = (line.strip().split() for line in self.token_lines())
+        yield from self.limit_iter(tokens) if self.limit else tokens
 
     def limit_iter(self, iterator):
         """Return iterator that yields self.limit elements of the passed
