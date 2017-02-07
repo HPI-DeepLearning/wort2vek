@@ -97,7 +97,3 @@ Spanien,Spanisch
 Ukraine,Ukrainisch
 Brasilien,Brasilianisch
 Italien,Italienisch
-: Technik - Produkte
-Android,Google
-iOS,Apple
-Windows,Microsoft
