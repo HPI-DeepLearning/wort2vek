@@ -117,16 +117,17 @@ class TrainingData(object):
     def batches(self, batch_size, is_train=True):
         """Return generator of training batches
         """
-        batch = []
+        while True:
+            batch = []
 
-        for item in self.dataset(is_train):
-            if len(batch) == batch_size:
+            for item in self.dataset(is_train):
+                if len(batch) == batch_size:
+                    yield batch
+                    batch = []
+                batch.append(item)
+
+            if len(batch):
                 yield batch
-                batch = []
-            batch.append(item)
-
-        if len(batch):
-            yield batch
 
 class NgramTrainingData(TrainingData):
     def __init__(self, corpus, n, restrict_vocab=None):
