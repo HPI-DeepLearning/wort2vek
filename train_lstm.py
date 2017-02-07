@@ -9,6 +9,7 @@ def train_lstm_nnlm(data_path, vector_file, epochs=1, batch_size=32):
 
     rnn_nnlm = RnnNNLM(training_data, word2vec)
     model = rnn_nnlm.train(int(epochs), int(batch_size))
+    rnn_nnlm.train(model)
     return model
 
 if __name__ == "__main__":
