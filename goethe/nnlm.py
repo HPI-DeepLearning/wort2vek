@@ -193,9 +193,7 @@ class NNLM(object):
         model.fit_generator(self.batches(batch_size),
                             samples_per_epoch=self.train_data.n_samples(),
                             nb_epoch=epochs,
-                            verbose=1,
-                            nb_worker=4,
-                            pickle_safe=True)
+                            verbose=1)
         return model
 
     def test(self, model, batch_size=32):
