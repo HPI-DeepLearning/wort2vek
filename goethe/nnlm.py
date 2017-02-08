@@ -15,33 +15,37 @@ class TrainingData(object):
     UNKNOWN_TOKEN = 'unk'
     TRAIN_PROB = 0.8
 
-    def __init__(self, corpus, restrict_vocab=None, ):
+    def __init__(self, corpus, restrict_vocab=None, split=True):
         self.corpus = corpus
         self.nb_words = restrict_vocab
         self.count = None
         self.word2index = None
         self.index2word = None
+        self.split = split
         self.build_indices()
-        self.maybe_split_corpus()
+        if self.split:
+            self.maybe_split_corpus()
+
+    def token_file(self, suffix=None):
+        path, ext = os.path.splitext(self.corpus.file_path(use_tokens=True))
+        return path + suffix + ext if suffix else path + ext
 
     @property
     def fn_train(self):
-        path, ext = os.path.splitext(self.corpus.file_path(use_tokens=True))
-        return path + '.train' + ext
+        return self.token_file('.train') if self.split else self.token_file()
 
     @property
     def fn_test(self):
-        path, ext = os.path.splitext(self.corpus.file_path(use_tokens=True))
-        return path + '.test' + ext
+        return self.token_file('.test') if self.split else self.token_file()
 
     @property
     def voc_size(self):
         return len(self.word2index)
 
     @classmethod
-    def from_path(cls, path, restrict_vocab=None):
+    def from_path(cls, path, restrict_vocab=None, split=True):
         corpus = Corpus(path)
-        return cls(corpus, restrict_vocab=restrict_vocab)
+        return cls(corpus, restrict_vocab=restrict_vocab, split=split)
 
     def maybe_split_corpus(self):
         if not os.path.isfile(self.fn_train):
@@ -139,10 +143,13 @@ class NgramTrainingData(TrainingData):
         corpus = Corpus(path, limit=limit)
         return cls(corpus, n, restrict_vocab=restrict_vocab)
 
+    def ngrams(self, numbers):
+        for i in range(0, len(numbers) - self.n + 1):
+            yield numbers[i:i+self.n]
+
     def dataset(self, is_train):
         for numbers in super().dataset(is_train):
-            for i in range(0, len(numbers) - self.n + 1):
-                yield numbers[i:i+self.n]
+            yield from self.ngrams(numbers)
 
 
 class SentencePartTrainingData(TrainingData):
@@ -203,6 +210,20 @@ class NNLM(object):
             self.batches(batch_size, is_train=False),
             self.train_data.n_samples(is_train=False))
 
+    def prob(self, model, sentence):
+        predictions = self.predict(model, sentence[:-1])
+        offset = len(sentence) - len(predictions)
+        target = self.train_data.sentence_to_numbers(sentence)[offset:]
+        prob = 1
+        for i, prediction in enumerate(predictions):
+            prob *= prediction[target[i]]
+        return prob
+
+    def predict_words(self, model, sentence):
+        predictions = self.predict(model, sentence)
+        nums = np.argmax(predictions, axis=1)
+        return self.train_data.numbers_to_sentence(nums)
+
     def predict(self, model, sentence):
         raise NotImplementedError
 
@@ -249,12 +270,10 @@ class NgramNNLM(NNLM):
 
     def predict(self, model, sentence):
         numbers = self.train_data.sentence_to_numbers(sentence)
-        n = self.train_data.n
-        last = numbers[-(n-1):]
-        prediction = model.predict(np.asarray([last]))
-        idx = np.argmax(prediction)
-        return self.train_data.index2word[idx]
-
+        ngrams = self.train_data.ngrams(numbers)
+        ngram_input = [ngram[:-1] for ngram in ngrams]
+        predictions = model.predict(np.asarray(ngram_input))
+        return predictions
 
 class RnnNNLM(NNLM):
     def __init__(self, train_data, word2vec, max_sequence_length=50):
@@ -273,9 +292,8 @@ class RnnNNLM(NNLM):
     def predict(self, model, sentence):
         numbers = self.train_data.sentence_to_numbers(sentence)
         padded = pad_sequences([numbers], self.n_inputs, padding='post')
-        predictions = model.predict(np.asarray(padded))
-        nums = [np.argmax(pred) for pred in predictions[0]]
-        return self.train_data.numbers_to_sentence(nums)
+        predictions = model.predict(np.asarray(padded))[0]
+        return predictions
 
     @staticmethod
     def compile_model(model):
@@ -295,39 +313,3 @@ class RnnNNLM(NNLM):
         y = np.asarray(y, dtype='int32')
         y = np.expand_dims(y, -1)
         return X, y
-
-
-class SentencePartRnnNNLM(NNLM):
-    def __init__(self, train_data, word2vec, max_sequence_length=50):
-        super().__init__(train_data, word2vec)
-        self.n_inputs = max_sequence_length
-        self.n_hidden = 400
-
-    def model(self):
-        model = Sequential()
-        model.add(self.embedding_layer(self.n_inputs))
-        model.add(LSTM(self.n_hidden))
-        model.add(Dense(self.voc_size, activation='softmax'))
-        return model
-
-    @staticmethod
-    def compile_model(model):
-        model.compile(optimizer='adam',
-                      loss='sparse_categorical_crossentropy',
-                      metrics=['sparse_categorical_accuracy'])
-
-    def predict(self, model, sentence):
-        numbers = self.train_data.sentence_to_numbers(sentence)
-        padded = pad_sequences([numbers], self.n_inputs, padding='post')
-        prediction = model.predict(np.asarray(padded))
-        idx = np.argmax(prediction)
-        return self.train_data.index2word[idx]
-
-    def split_batch(self, parts):
-        X = list()
-        y = list()
-        for part in parts:
-            X.append(part[0])
-            y.append(part[1])
-        X_pad = pad_sequences(X, maxlen=self.n_inputs, padding='post')
-        return np.asarray(X_pad, dtype='int32'), np.asarray(y, dtype='int32')
