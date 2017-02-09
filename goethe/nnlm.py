@@ -212,11 +212,11 @@ class NNLM(object):
 
     def prob(self, model, sentence):
         predictions = self.predict(model, sentence[:-1])
-        offset = len(sentence) - len(predictions)
-        target = self.train_data.sentence_to_numbers(sentence)[offset:]
+        targets = self.train_data.sentence_to_numbers(sentence)[1:]
         prob = 1
-        for i, prediction in enumerate(predictions):
-            prob *= prediction[target[i]]
+        for prediction, target in zip(predictions, targets):
+            if target != 0:
+                prob *= prediction[target]
         return prob
 
     def predict_words(self, model, sentence):
@@ -308,7 +308,7 @@ class RnnNNLM(NNLM):
 
     @staticmethod
     def compile_model(model):
-        model.compile(optimizer='rmsprob',
+        model.compile(optimizer='rmsprop',
                       loss='sparse_categorical_crossentropy',
                       metrics=['sparse_categorical_accuracy'])
 
