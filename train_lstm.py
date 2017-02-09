@@ -34,7 +34,7 @@ if __name__ == "__main__":
         metavar="BATCH_SIZE", help="Number of sentences processed in one batch.")
     parser.add_argument("-r", "--restrict-vocab", dest="restrict_vocab", type=int,
         metavar="VOCABS_SIZE", help="Max vocab size. Can reduce memory consumption heavily")
-    parser.add_argument("-m", "--max-length", dest="max_sequence_length", type=int
+    parser.add_argument("-m", "--max-length", dest="max_sequence_length", type=int,
         metavar="MAX_SENTENCE_LENGTH", help="Max length of a sentence for lstm.")
 
     args = parser.parse_args()
