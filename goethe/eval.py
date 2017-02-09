@@ -1,7 +1,9 @@
 import re
 import os
-import pandas as pd
 import gensim
+import random
+import pandas as pd
+from collections import defaultdict
 
 
 def summarize(sections):
@@ -60,3 +62,31 @@ def gridsearch_evaluation(models_path, questions_path):
     df = pd.DataFrame.from_records(per_model_results)
     df = df[list(conf) + list(section_accs)]
     return df
+
+
+def question_counts(questions_path):
+    """Return mapping from question categories to number of questions.
+    """
+    categories = defaultdict(int)
+    with open(questions_path) as f:
+        for line in f:
+            if line.startswith(':'):
+                category = line[2:].strip()
+            else:
+                categories[category] += 1
+    return categories
+
+
+def question_examples(questions_path, n=5):
+    """Return mapping from question categories to `n` example questions.
+    """
+    ctgrs = defaultdict(list)
+    with open(questions_path) as f:
+        for i, line in enumerate(f):
+            if line.startswith(':'):
+                if i:
+                    ctgrs[c] = random.sample(ctgrs[c], min(n, len(ctgrs[c])))
+                c = line[2:].strip()
+            else:
+                ctgrs[c].append(line.strip())
+    return ctgrs
