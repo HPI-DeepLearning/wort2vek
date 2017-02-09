@@ -224,6 +224,13 @@ class NNLM(object):
         nums = np.argmax(predictions, axis=1)
         return self.train_data.numbers_to_sentence(nums)
 
+    def topn_next_words(self, model, sentence, n=3):
+        res = self.predict(model, sentence)[0][-1]
+        index = self.train_data.index2word
+        pairs = [(index[i], p) for i, p in enumerate(res)]
+        pairs.sort(key=lambda p: p[1], reverse=True)
+        return pairs[:n]
+
     def predict(self, model, sentence):
         raise NotImplementedError
 
@@ -279,13 +286,17 @@ class RnnNNLM(NNLM):
     def __init__(self, train_data, word2vec, max_sequence_length=50):
         super().__init__(train_data, word2vec)
         self.n_inputs = max_sequence_length
-        self.n_hidden = 400
+        self.n_hidden = 500
 
     def model(self):
         model = Sequential()
         model.add(self.embedding_layer(self.n_inputs))
-        model.add(LSTM(self.n_hidden, input_length=self.n_inputs, return_sequences=True))
-        model.add(TimeDistributed(Dense(output_dim=self.voc_size, input_dim=self.n_hidden)))
+        model.add(LSTM(self.n_hidden,
+                       input_length=self.n_inputs,
+                       return_sequences=True,
+                       consume_less='mem'))
+        model.add(TimeDistributed(Dense(output_dim=self.voc_size,
+                                        input_dim=self.n_hidden)))
         model.add(Activation('softmax'))
         return model
 
@@ -297,7 +308,7 @@ class RnnNNLM(NNLM):
 
     @staticmethod
     def compile_model(model):
-        model.compile(optimizer='adam',
+        model.compile(optimizer='rmsprob',
                       loss='sparse_categorical_crossentropy',
                       metrics=['sparse_categorical_accuracy'])
 
