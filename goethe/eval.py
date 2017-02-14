@@ -74,7 +74,7 @@ def question_counts(questions_path):
                 category = line[2:].strip()
             else:
                 categories[category] += 1
-    return categories
+    return dict(categories)
 
 
 def question_examples(questions_path, n=5):
@@ -89,4 +89,4 @@ def question_examples(questions_path, n=5):
                 c = line[2:].strip()
             else:
                 ctgrs[c].append(line.strip())
-    return ctgrs
+    return dict(ctgrs)
