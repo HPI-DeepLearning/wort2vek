@@ -2,6 +2,7 @@ import os
 from . import util
 import itertools as it
 
+
 class Corpus:
     def __init__(self, path, limit=None):
         """Pass path to corpus. Expects following structure:

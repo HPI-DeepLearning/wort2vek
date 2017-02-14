@@ -1,9 +1,14 @@
 import re
 import os
-import gensim
 import random
-import pandas as pd
+import itertools as it
+import multiprocessing as mp
 from collections import defaultdict
+
+import gensim
+import pandas as pd
+
+import goethe
 
 
 def summarize(sections):
@@ -90,3 +95,28 @@ def question_examples(questions_path, n=5):
             else:
                 ctgrs[c].append(line.strip())
     return dict(ctgrs)
+
+
+def gridsearch(data_path, gs_confs, sent_limits=None):
+    """For each model/limit configuration yield a trained model and a model name.
+    Takes dictionary of `configurations` for gensim's Word2Vec, e.g.:
+        { 'size': [300, 600], 'sg': [0, 1] }
+    and optional list of sentence limits.
+    """
+    confs = it.product(*gs_confs.values(),
+                       sent_limits if sent_limits else [False])
+
+    for *mconf, slimit in confs:
+        mconf = {k: v for k, v in zip(gs_confs.keys(), mconf)}
+        sents = goethe.corpora.Corpus(data_path, limit=slimit)
+        model = gensim.models.Word2Vec(sentences=sents, **mconf, workers=8)
+        yield model, model_name(mconf, slimit)
+
+
+def model_name(conf, sentence_limit=None):
+    """Join a model configuration and sentence limit into a model identifier.
+    """
+    tokens = ['%s%s' % (k, v) for k, v in conf.items()]
+    if sentence_limit:
+        tokens.append('n%s' % sentence_limit)
+    return '_'.join(sorted(tokens))
