@@ -1,4 +1,4 @@
-: signular,plural
+: Singular,Plural
 Abbildung,Abbildungen
 Absatz,Absätze
 Anfang,Anfänge
@@ -21,7 +21,6 @@ Ende,Enden
 Entwicklung,Entwicklungen
 Erfahrung,Erfahrungen
 Ergebnis,Ergebnisse
-Euro,Euro
 Familie,Familien
 Folge,Folgen
 Form,Formen

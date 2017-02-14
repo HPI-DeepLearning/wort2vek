@@ -1,7 +1,38 @@
+: Politiker,Partei
+Merkel,CDU
+Schröder,SPD
+Seehofer,CSU
+Westerwelle,FDP
+Wagenknecht,Linkspartei
+Gysi,PDS
+Obama,Demokraten
+Bush,Republikaner
+Hitler,NSDAP
+Honecker,SED
+: Gotteshaus,Religion
+Kirche,Christen
+Moschee,Moslems
+Synagoge,Juden
+Tempel,Buddhisten
+: Werk,Erzeuger
+Tisch,Tischler
+Garten,Gärtner
+Foto,Fotograf
+Film,Regisseur
+Auto,Kfz-Mechaniker
+: Wissenschaftsbereich,Berufsbezeichnung
+Physik,Physiker
+Biologie,Biologe
+Mathematik,Mathematiker
+Chemie,Chemiker
+Geologie,Geologe
+Archäologie,Archäologe
+Informatik,Informatiker
+Soziologie,Soziologe
+Psychologie,Psychologe
 : Land,Währung
 China,Yuan
 Deutschland,Euro
-Frankreich,Euro
 Dänemark,Krone
 Japan,Yen
 Russland,Rubel
@@ -9,36 +40,27 @@ USA,Dollar
 Großbritannien,Pfund
 Kroatien,Kuna
 Südafrika,Rand
-Thailand,Baht
 Indien,Rupien
 Schweiz,Franken
 Türkei,Lira
 : Hauptstadt,Land
 Athen,Griechenland
 Bagdad,Irak
-Bangkok,Thailand
 Berlin,Deutschland
-Bern,Schweiz
-Hanoi,Vietnam
 Helsinki,Finnland
 Kairo,Ägypten
 Kiew,Ukraine
 London,England
-Edinburgh,Schottland
-Madrid,Spanien
 Melbourne,Australien
 Moskau,Russland
 Oslo,Norwegen
 Ottawa,Kanada
 Paris,Frankreich
-Rom,Italien
 Stockholm,Schweden
 Teheran,Iran
 Tokio,Japan
 Washington,USA
-Kopenhagen,Dänemark
 Wien,Österreich
-Indien,Neu-Delhi
 China,Peking
 Japan,Tokio
 : Bundesland,Landeshauptstadt
@@ -56,74 +78,22 @@ Schleswig-Holstein,Kiel
 Thüringen,Erfurt
 : Land,Kontinent
 Brasilien,Südamerika
-Argentinien,Südamerika
-Kolumbien,Südamerika
 Deutschland,Europa
-England,Europa
-Frankreich,Europa
-Griechenland,Europa
-Italien,Europa
-Spanien,Europa
-Polen,Europa
-Indien,Asien
 China,Asien
-Vietnam,Asien
-Japan,Asien
-Israel,Asien
-Kanada,Nordamerika
 USA,Nordamerika
-Mexiko,Nordamerika
 Ägypten,Afrika
-Somalia,Afrika
-Libyen,Afrika
-Kongo,Afrika
 : Land,Sprache/Adjektiv
 China,Chinesisch
 Deutschland,Deutsch
 England,Englisch
-Großbritannien,Britisch
 Frankreich,Französisch
-Griechenland,Griechisch
 Italien,Italienisch
 Japan,Japanisch
-Korea,Koreanisch
 Norwegen,Norwegisch
 Polen,Polnisch
 Russland,Russisch
 Schweden,Schwedisch
 Spanien,Spanisch
 Ukraine,Ukrainisch
-USA,Amerikanisch
 Brasilien,Brasilianisch
 Italien,Italienisch
-Griechenland,Griechisch
-Türkei,Türkisch
-Niederlande,Niederländisch
-: Technik - Produkte
-Android,Google
-iOS,Apple
-Windows,Microsoft
-: Technik - Browser
-Chrome,Google
-Explorer,Microsoft
-Firefox,Mozilla
-Safari,Apple
-: Geschlecht
-Bruder,Schwester
-Bräutigam,Braut
-Ehemann,Ehefrau
-Enkel,Enkelin
-er,sie
-Großvater,Großmutter
-Junge,Mädchen
-König,Königin
-Mann,Frau
-männlich,weiblich
-Neffe,Nichte
-Onkel,Tante
-Papa,Mama
-Partner,Partnerin
-Prinz,Prinzessin
-Vater,Mutter
-Lehrer,Lehrerin
-Student,Studentin
