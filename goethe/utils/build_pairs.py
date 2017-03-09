@@ -4,6 +4,7 @@ from collections import deque
 from tqdm import tqdm
 import itertools as it
 from random import random
+import argparse
 
 LANG = 'de'
 BATCH_SIZE = 10000
@@ -12,7 +13,7 @@ N_THREADS = 4
 parser = argparse.ArgumentParser(description='Create file of word context pairs.')
 parser.add_argument('input', metavar='FILE')
 parser.add_argument('--output', metavar='FILE')
-parser.add_argument('max_level', metavar='N', type=int)
+parser.add_argument('--max_level', metavar='N', type=int, default=3)
 args = parser.parse_args()
 
 MAX_LEVEL = args.max_level
