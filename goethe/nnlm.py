@@ -10,6 +10,8 @@ from collections import Counter
 from .corpora import Corpus
 import os
 import random
+from gensim.models.word2vec import Word2Vec
+import keras.callbacks
 
 class TrainingData(object):
     UNKNOWN_TOKEN = 'unk'
@@ -173,7 +175,7 @@ class NNLM(object):
         return self.word2vec.vector_size
 
     def embedding_matrix(self):
-        embedding = np.zeros((self.voc_size + 1, self.vector_size))
+        embedding = np.zeros((self.voc_size, self.vector_size))
 
         for word, i in self.train_data.word2index.items():
             try:
@@ -184,7 +186,7 @@ class NNLM(object):
         return embedding
 
     def embedding_layer(self, n_inputs, mask_zero=True):
-        return Embedding(self.voc_size + 1,
+        return Embedding(self.voc_size,
                          self.vector_size,
                          weights=[self.embedding_matrix()],
                          input_length=n_inputs,
@@ -197,12 +199,17 @@ class NNLM(object):
 
     def train(self, epochs=1, batch_size=32, model=None):
         if not model:
-            model = self.model()
+            model = self.model(batch_size)
             self.compile_model(model)
+        tensorboard = keras.callbacks.TensorBoard(log_dir='./tensorboard_logs',
+                                               histogram_freq=1,
+                                               write_graph=True,
+                                               write_images=True)
         model.fit_generator(self.batches(batch_size),
                             samples_per_epoch=self.train_data.n_samples(),
                             nb_epoch=epochs,
-                            verbose=1)
+                            verbose=1,
+                            callbacks=[tensorboard])
         return model
 
     def test(self, model, batch_size=32):
@@ -225,16 +232,16 @@ class NNLM(object):
         return self.train_data.numbers_to_sentence(nums)
 
     def topn_next_words(self, model, sentence, n=3):
-        res = self.predict(model, sentence)[0][-1]
+        res = self.predict(model, sentence)[-1]
         index = self.train_data.index2word
-        pairs = [(index[i], p) for i, p in enumerate(res)]
+        pairs = [(index[i], p) for i, p in enumerate(list(res))]
         pairs.sort(key=lambda p: p[1], reverse=True)
         return pairs[:n]
 
     def predict(self, model, sentence):
         raise NotImplementedError
 
-    def model(self):
+    def model(self, batch_size):
         raise NotImplementedError
 
     def compile_model(self, model):
@@ -261,7 +268,7 @@ class NgramNNLM(NNLM):
             y += [triple[-1]]
         return np.array(X), np.array(y)
 
-    def model(self):
+    def model(self, batch_size):
         model = Sequential()
         model.add(self.embedding_layer(self.train_data.n - 1, mask_zero=False))
         model.add(Flatten())
@@ -282,19 +289,30 @@ class NgramNNLM(NNLM):
         predictions = model.predict(np.asarray(ngram_input))
         return predictions
 
+
 class RnnNNLM(NNLM):
-    def __init__(self, train_data, word2vec, max_sequence_length=50):
+    def __init__(self, train_data, word2vec, max_sequence_length=40, stateful=False):
         super().__init__(train_data, word2vec)
         self.n_inputs = max_sequence_length
         self.n_hidden = 500
+        self.stateful = stateful
 
-    def model(self):
+    @classmethod
+    def from_paths(cls, train_data_path, word2vec_path, restrict_vocab=None,
+                   max_sequence_length=40, stateful=False):
+        data = TrainingData.from_path(train_data_path, restrict_vocab)
+        word2vec = Word2Vec.load(word2vec_path)
+        word2vec.init_sims(replace=True)
+        return cls(data, word2vec, max_sequence_length, stateful)
+
+    def model(self, batch_size):
         model = Sequential()
         model.add(self.embedding_layer(self.n_inputs))
         model.add(LSTM(self.n_hidden,
-                       input_length=self.n_inputs,
-                       return_sequences=True,
-                       consume_less='mem'))
+                       stateful=self.stateful,
+                       batch_input_shape=(batch_size, self.n_inputs, self.vector_size),
+                       return_sequences=True))#,
+                    #    consume_less='mem'))
         model.add(TimeDistributed(Dense(output_dim=self.voc_size,
                                         input_dim=self.n_hidden)))
         model.add(Activation('softmax'))
@@ -308,7 +326,7 @@ class RnnNNLM(NNLM):
 
     @staticmethod
     def compile_model(model):
-        model.compile(optimizer='rmsprop',
+        model.compile(optimizer='adam',
                       loss='sparse_categorical_crossentropy',
                       metrics=['sparse_categorical_accuracy'])
 

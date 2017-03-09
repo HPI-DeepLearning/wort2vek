@@ -1,18 +1,18 @@
 from argparse import ArgumentParser
 
-def train_lstm_nnlm(data_path, vector_file, epochs=1, batch_size=32,
-                    restrict_vocab=100000, model_file=None, max_sequence_length=40):
+def train_lstm_nnlm(data_path, vector_file, epochs=1, batch_size=32, model_file=None,
+                    restrict_vocab=100000, max_sequence_length=40, stateful=False, split=True):
     from goethe.nnlm import TrainingData, RnnNNLM
     from gensim.models.word2vec import Word2Vec
     # Fail early if h5py is not installed
     if model_file:
         import h5py
 
-    training_data = TrainingData.from_path(data_path, restrict_vocab=restrict_vocab)
+    training_data = TrainingData.from_path(data_path, restrict_vocab=restrict_vocab, split=True)
     word2vec = Word2Vec.load(vector_file)
     word2vec.init_sims(replace=True)
 
-    rnn_nnlm = RnnNNLM(training_data, word2vec, max_sequence_length)
+    rnn_nnlm = RnnNNLM(training_data, word2vec, max_sequence_length, stateful)
     model = rnn_nnlm.train(epochs, batch_size)
     rnn_nnlm.test(model)
     if model_file:
@@ -36,6 +36,10 @@ if __name__ == "__main__":
         metavar="VOCABS_SIZE", help="Max vocab size. Can reduce memory consumption heavily")
     parser.add_argument("-m", "--max-length", dest="max_sequence_length", type=int,
         metavar="MAX_SENTENCE_LENGTH", help="Max length of a sentence for lstm.")
+    parser.add_argument("--stateful", dest="stateful", action='store_true',
+        help="If set, the last state in a batch will be used as initial state for the following batch")
+    parser.add_argument("--dont-split", dest="split", action='store_false',
+        help="If set, the data is not split into train and test data.")
 
     args = parser.parse_args()
     param_dict = dict((k, v) for k, v in vars(args).items() if v)
