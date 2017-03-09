@@ -2,7 +2,6 @@ import re
 import os
 import random
 import itertools as it
-import multiprocessing as mp
 from collections import defaultdict
 
 import gensim
@@ -17,7 +16,7 @@ def summarize(sections):
     """
     return {s['section']: round(len(s['correct'])
                                 / (len(s['correct']) + len(s['incorrect'])), 2)
-            for s in sections}
+            for s in sections if len(s['correct']) + len(s['incorrect'])}
 
 
 def split_conf(name):
