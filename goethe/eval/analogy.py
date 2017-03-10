@@ -1,3 +1,4 @@
+import os
 import argparse
 from collections import defaultdict
 import gensim.models.keyedvectors
@@ -9,7 +10,7 @@ def accuracy(questions, model):
     Returns the gensim's evaluation.
     """
     model = gensim.models.KeyedVectors.load_word2vec_format(model)
-    return model.wv.accuracy(questions)
+    return model.accuracy(questions)
 
 
 def accuracy_as_df(sections):
@@ -25,7 +26,7 @@ def accuracy_as_df(sections):
         total = correct + incorrect
         accuracy = round(correct / total, 2) if total else 0
         return {'name': name, 'accuracy': accuracy, 'correct': correct,
-                'incorrect': incorrect, 'total': total}
+                'incorrect': incorrect, 'answered': total}
 
     collapsed_sections = [collapse_section(s) for s in sections]
     return pd.DataFrame.from_records(collapsed_sections, index='name')
@@ -41,7 +42,8 @@ def count_sections(questions):
                 current = line.split(':')[1].strip()
             else:
                 counts[current] += 1
-    return counts
+    counts['total'] = sum(counts.values())
+    return pd.Series(counts).astype(int)
 
 
 if __name__ == "__main__":
@@ -51,13 +53,27 @@ if __name__ == "__main__":
                         help='questions file in word2vec format')
     parser.add_argument('model_files', nargs='+',
                         help='one or more models to be evaluated')
-    parser.add_argument('-c', '--counts',
+    parser.add_argument('-o', '--output', default='.',
+                        help='folder to write output files')
+    parser.add_argument('-c', '--counts', default=False, action='store_true',
                         help='create an output file for each model containing the counts of correct/incorrect/total answers')
     args = parser.parse_args()
-    print(args)
 
-    exit()
-    questions_file, model_files = args.questions_file, args.model_files
-    evaluate_dfs = [accuracy_as_df(accuracy(questions_file, m))
-                    for m in model_files]
+    counts = count_sections(args.questions_file)
+    dfs = []
+    for m in args.model_files:
+        results = accuracy(args.questions_file, m)
+        df = accuracy_as_df(results)
+        df = df.assign(total=counts)
+        df.name = os.path.splitext(os.path.basename(m))[0]
+        dfs.append(df)
 
+    os.makedirs(args.output, exist_ok=True)
+    if args.counts:
+        for df in dfs:
+            df.to_csv(os.path.join(args.output, 'analogy.' + df.name))
+    else:
+        accuracy_df = pd.concat([df['accuracy'] for df in dfs], axis=1).T
+        accuracy_df.index = [df.name for df in dfs]
+        accuracy_df.to_csv(os.path.join(args.output, 'analogy.accuracy'),
+                           index_label='model')
