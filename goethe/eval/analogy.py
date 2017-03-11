@@ -74,9 +74,9 @@ def accuracy_df(questions, model):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='Evaluate model and generate CSV with results')
-    parser.add_argument('-q', '--questions', nargs='+',
+    parser.add_argument('-q', '--questions', nargs='+', required=True,
                         help='questions file in word2vec format')
-    parser.add_argument('-m', '--models', nargs='+',
+    parser.add_argument('-m', '--models', nargs='+', required=True,
                         help='one or more models to be evaluated')
     parser.add_argument('-o', '--output', default='.',
                         help='folder to write output files')
