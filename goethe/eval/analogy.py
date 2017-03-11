@@ -116,4 +116,4 @@ if __name__ == "__main__":
             print(accuracy_df)
         else:
             path = os.path.join(args.output, f'{ACCURACY}{OUT_EXT}')
-            accuracy_df.to_csv(index_label=MODEL, path=path)
+            accuracy_df.to_csv(path, index_label=MODEL)
