@@ -70,6 +70,9 @@ def accuracy_df(questions, model):
             .assign(questions=count_sections(questions))
             .rename({'total': f'{name(questions)} {TOTAL}'}))
 
+def evaluate_models_against_questions(models, questions):
+    pass
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -116,4 +119,4 @@ if __name__ == "__main__":
             print(accuracy_df)
         else:
             path = os.path.join(args.output, f'{ACCURACY}{OUT_EXT}')
-            accuracy_df.to_csv(path, index_label=MODEL)
+            accuracy_df.to_csv(path, index_label=SECTION)
