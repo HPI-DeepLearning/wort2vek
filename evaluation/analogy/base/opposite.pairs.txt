@@ -53,7 +53,6 @@ Freund,Feind
 freundlich,unfreundlich
 frieren,schwitzen
 gefangen,frei
-Geiz,Verschwendung
 gerade,krumm
 geschlossen,offen
 gesund,krank
@@ -61,7 +60,7 @@ Gewinner,Verlierer
 grüßen,verabschieden
 gut,schlecht
 hübsch,hässlich
-haarig,glatt
+rau,glatt
 heiß,kalt
 Heirat,Scheidung
 Himmel,Erde
@@ -95,4 +94,3 @@ transparent,undurchsichtig
 unterschiedlich,gleich
 Vergangenheit,Zukunft
 Wissen,Unwissen
-Zahlen,Buchstaben
