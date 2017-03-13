@@ -37,6 +37,8 @@ Kunst,Künstler
 : Land,Währung
 China,Yuan
 Deutschland,Euro
+Frankreich,Euro
+Belgien,Euro
 Dänemark,Krone
 Japan,Yen
 Russland,Rubel
@@ -65,8 +67,14 @@ Teheran,Iran
 Tokio,Japan
 Washington,USA
 Wien,Österreich
+Belgien,Brüssel
 China,Peking
 Japan,Tokio
+Türkei,Istanbul
+Ungarn,Budapest
+Tschechien,Prag
+Tunesien,Tunis
+Pakistand,Islamabad
 : Bundesland,Landeshauptstadt
 Baden-Württemberg,Stuttgart
 Bayern,München
@@ -101,3 +109,7 @@ Spanien,Spanisch
 Ukraine,Ukrainisch
 Brasilien,Brasilianisch
 Italien,Italienisch
+Ungarn,Ungarisch
+Türkei,Türkisch
+Bayern,Bayerisch
+Pakistan,Urdu
