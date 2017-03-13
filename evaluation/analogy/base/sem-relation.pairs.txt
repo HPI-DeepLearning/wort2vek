@@ -1,5 +1,6 @@
 : Politiker,Partei
 Merkel,CDU
+Altmaier,CDU
 Schröder,SPD
 Gabriel,SPD
 Steinmeier,SPD
@@ -11,6 +12,7 @@ Obama,Demokraten
 Bush,Republikaner
 Hitler,NSDAP
 Honecker,SED
+Erdogan,AKP
 : Werk,Erzeuger
 Tisch,Tischler
 Garten,Gärtner
