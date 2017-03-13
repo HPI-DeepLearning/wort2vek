@@ -22,7 +22,7 @@ def eval_similarity(model_filenames):
             row = [testset_name, sims[2], *sims[0], *sims[1]]
             rows.append(row)
         model_name = os.path.basename(model_filename).split(os.path.extsep)[0]
-        df = pd.DataFrame(rows, columns=header)
+        df = pd.DataFrame(rows, columns=header).set_index('testset')
         yield model_name, df
 
 
