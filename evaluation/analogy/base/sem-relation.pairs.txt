@@ -1,6 +1,8 @@
 : Politiker,Partei
 Merkel,CDU
 Schröder,SPD
+Gabriel,SPD
+Steinmeier,SPD
 Seehofer,CSU
 Westerwelle,FDP
 Wagenknecht,Linkspartei
@@ -9,11 +11,6 @@ Obama,Demokraten
 Bush,Republikaner
 Hitler,NSDAP
 Honecker,SED
-: Gotteshaus,Religion
-Kirche,Christen
-Moschee,Moslems
-Synagoge,Juden
-Tempel,Buddhisten
 : Werk,Erzeuger
 Tisch,Tischler
 Garten,Gärtner

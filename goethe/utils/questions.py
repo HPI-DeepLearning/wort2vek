@@ -1,6 +1,7 @@
 import itertools as it
 from collections import defaultdict
 import random
+import os
 
 def tuples_to_sections(in_filename):
     # Load file and store pairs grouped by sections
@@ -45,6 +46,10 @@ def all_pairs(l):
             if e1 != e2:
                 yield (e1, e2)
 
+def all_unique(t):
+    t1, t2, t3, t4 = t
+    return t1 != t3 and t1 != t4 and t2 != t3 and t2 != t4
+
 def sections_to_pairs(sections):
     # For each sections generate 4-tuples
     for section in sections:
@@ -56,7 +61,8 @@ def sections_to_pairs(sections):
     for s in sections:
         yield s['name']
         for t in s['4-tuples']:
-            yield ' '.join(t)
+            if all_unique(t):
+                yield ' '.join(t)
 
 def quadruples(filename):
     if filename.endswith('.pairs.txt'):
@@ -106,23 +112,23 @@ def count(questions):
 
 
 
-in_path = 'evaluation/base/'
-out_path = 'evaluation/'
+in_path = 'evaluation/analogy/base'
+out_path = 'evaluation/analogy'
 
 sem_files = [
-    'semantic.pairs.txt',
-    'gender.pairs.txt',
-    'opposite.pairs.txt'
+    'sem-relation.pairs.txt',
+    'sem-gender.pairs.txt',
 ]
 syn_files = [
-    'adjectives.tuples.txt',
-    'verbs.tuples.txt',
-    'grammatical-number.pairs.txt'
+    'syn-opposite.pairs.txt',
+    'syn-adjective.tuples.txt',
+    'syn-verb.tuples.txt',
+    'syn-noun.pairs.txt'
 ]
 
 def create(in_files, out_file):
-    file_paths = [in_path + f for f in in_files]
-    out_file = out_path + out_file
+    file_paths = [os.path.join(in_path, f) for f in in_files]
+    out_file = os.path.join(out_path, out_file)
     files_to_quadtruples(file_paths, out_file)
 
 def create_all():
