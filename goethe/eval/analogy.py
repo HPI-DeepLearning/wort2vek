@@ -103,7 +103,7 @@ if __name__ == "__main__":
     parser.add_argument('-m', '--models', nargs='+', required=True,
                         help='one or more models to be evaluated')
     parser.add_argument(
-        '-o', '--output', help='folder to write output files, ommission will cause printing')
+        '-o', '--output', help='folder to write output files, omission will cause printing')
     parser.add_argument('-c', '--counts', default=False, action='store_true',
                         help='create an output file for each model containing the counts of correct/incorrect/total answers')
     args = parser.parse_args()

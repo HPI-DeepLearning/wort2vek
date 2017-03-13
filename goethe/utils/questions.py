@@ -109,21 +109,25 @@ def count(questions):
 in_path = 'evaluation/base/'
 out_path = 'evaluation/'
 
+sem_files = [
+    'semantic.pairs.txt',
+    'gender.pairs.txt',
+    'opposite.pairs.txt'
+]
+syn_files = [
+    'adjectives.tuples.txt',
+    'verbs.tuples.txt',
+    'grammatical-number.pairs.txt'
+]
+
 def create(in_files, out_file):
     file_paths = [in_path + f for f in in_files]
     out_file = out_path + out_file
     files_to_quadtruples(file_paths, out_file)
 
 def create_all():
-    files =[
-        'semantic.pairs.txt',
-        'gender.pairs.txt',
-        'grammatical-number.pairs.txt',
-        'opposite.pairs.txt',
-        'adjectives.tuples.txt',
-        'verbs.tuples.txt'
-    ]
-    create(files, 'question-words.txt')
+    create(sem_files, 'sem-question-words.txt')
+    create(syn_files, 'syn-question-words.txt')
 
 if __name__ == '__main__':
     create_all()
