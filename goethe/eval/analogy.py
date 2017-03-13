@@ -12,6 +12,7 @@ SECTION = 'section'  # name of sections in questions file (start with ':')
 ACCURACY = 'accuracy'  # name accuracy
 TOTAL = '(total)'  # identifier for summary sections
 QUESTIONS = 'questions'  # number of questions in a section
+OOV = 'oov'  # out of vocabulary rate
 MODEL = 'model'  # name of models
 OUT_EXT = '.analogy'  # extension used for output files
 
@@ -47,7 +48,7 @@ def count_sections(questions):
     return counts
 
 
-def accuracy_df(questions, model):
+def accuracy_df(model, questions):
     """Create a dataframe with every section name as row and evaluation results
     (accuracy, correct/incorrect/total answers) as columns.
     """
@@ -67,8 +68,31 @@ def accuracy_df(questions, model):
 
     collapsed_sections = [collapse_section(s) for s in sections]
     return (pd.DataFrame.from_records(collapsed_sections, index=SECTION)
-            .assign(questions=count_sections(questions))
+            .assign(**{QUESTIONS: count_sections(questions)})
+            .assign(**{OOV: lambda df: 1 - (df[ANSWERED] / df[QUESTIONS])})
             .rename({'total': f'{name(questions)} {TOTAL}'}))
+
+
+def multiple_accuracy_df(model, questions):
+    """Create accuracy dataframe for single model with multiple question files.
+    """
+    df = pd.concat(accuracy_df(model, q) for q in questions)
+    # Divide sum by two because of the per file total columns
+    total = df.sum().div(2).rename(TOTAL).astype(int)
+    df = df.append(total)
+    df.loc[TOTAL, ACCURACY] = (df.loc[TOTAL, CORRECT]
+                               / df.loc[TOTAL, ANSWERED])
+    df.name = name(model)
+    return df
+
+
+def combine_accuracy_dfs(dfs):
+    """Combine accuracies of multiple dataframes into single dataframe of accuracies
+    per model per question file.
+    """
+    combined_df = pd.concat([df[ACCURACY] for df in model_dfs], axis=1)
+    combined_df.columns = [df.name for df in model_dfs]
+    return combined_df
 
 
 if __name__ == "__main__":
@@ -78,42 +102,27 @@ if __name__ == "__main__":
                         help='questions file in word2vec format')
     parser.add_argument('-m', '--models', nargs='+', required=True,
                         help='one or more models to be evaluated')
-    parser.add_argument('-o', '--output', default='.',
-                        help='folder to write output files')
+    parser.add_argument(
+        '-o', '--output', help='folder to write output files, omission will cause printing')
     parser.add_argument('-c', '--counts', default=False, action='store_true',
                         help='create an output file for each model containing the counts of correct/incorrect/total answers')
-    parser.add_argument('-t', '--totals', default=False, action='store_true',
-                        help=f"move all summary sections (containing '{TOTAL}') to the end")
-    parser.add_argument('-p', '--print', default=False, action='store_true',
-                        help='print output instead of writing to file')
     args = parser.parse_args()
 
-    model_dfs = []
-    for m in args.models:
-        df = pd.concat(accuracy_df(q, m) for q in args.questions)
-        # Divide sum by two because of the per file total columns
-        total = df.sum().div(2).rename(TOTAL).astype(int)
-        df = df.append(total)
-        df.loc[TOTAL, ACCURACY] = (df.loc[TOTAL, CORRECT]
-                                   / df.loc[TOTAL, ANSWERED])
-        if args.totals:
-            df = end_with_totals(df)
-        df.name = name(m)
-        model_dfs.append(df)
+    model_dfs = [multiple_accuracy_df(m, args.questions)
+                 for m in args.models]
 
-    os.makedirs(args.output, exist_ok=True)
+    combined_df = combine_accuracy_dfs(model_dfs)
+    if args.output:
+        os.makedirs(args.output, exist_ok=True)
+        path = os.path.join(args.output, f'{ACCURACY}{OUT_EXT}')
+        combined_df.round(3).to_csv(path, index_label=SECTION)
+    else:
+        print(combined_df)
+
     if args.counts:
         for df in model_dfs:
-            if args.print:
-                print(df)
+            if args.output:
+                df.round(3).to_csv(os.path.join(args.output, f'{df.name}{OUT_EXT}'),
+                                   index_label=SECTION)
             else:
-                df.to_csv(os.path.join(args.output, f'{df.name}{OUT_EXT}'),
-                          index_label=SECTION)
-    else:
-        accuracy_df = pd.concat([df[ACCURACY] for df in model_dfs], axis=1)
-        accuracy_df.columns = [df.name for df in model_dfs]
-        if args.print:
-            print(accuracy_df)
-        else:
-            path = os.path.join(args.output, f'{ACCURACY}{OUT_EXT}')
-            accuracy_df.to_csv(path, index_label=SECTION)
+                print(df)
