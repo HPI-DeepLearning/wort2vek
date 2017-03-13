@@ -20,7 +20,8 @@ Garten,Gärtner
 Foto,Fotograf
 Film,Regisseur
 Auto,Kfz-Mechaniker
-: Wissenschaftsbereich,Berufsbezeichnung
+: Bereich,Berufsbezeichnung
+Medizin,Arzt
 Physik,Physiker
 Biologie,Biologe
 Mathematik,Mathematiker
@@ -30,6 +31,12 @@ Archäologie,Archäologe
 Informatik,Informatiker
 Soziologie,Soziologe
 Psychologie,Psychologe
+Physiotherapie,Physiotherapeut
+Meteorologie,Meteorologe
+Jura,Jurist
+Astronomie,Astronom
+Musik,Musiker
+Kunst,Künstler
 : Land,Währung
 China,Yuan
 Deutschland,Euro
