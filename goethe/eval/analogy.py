@@ -86,7 +86,7 @@ def multiple_accuracy_df(model, questions):
     return df
 
 
-def combine_accuracy_dfs(dfs):
+def combine_accuracy_dfs(model_dfs):
     """Combine accuracies of multiple dataframes into single dataframe of accuracies
     per model per question file.
     """
