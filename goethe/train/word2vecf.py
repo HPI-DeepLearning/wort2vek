@@ -1,14 +1,15 @@
+import os
 import argparse
 import subprocess
 import itertools as it
 
-from pprint import pprint
 # name =$2
 # cv = "$name.cv.txt"
 # wv = "$name.wv.txt"
 # . / count_and_filter - train $1 - cvocab $cv - wvocab $wv - min - count 100
 # . / word2vecf - train $1 - wvocab $wv - cvocab $cv - output "$name.vec" - dumpcv "$name.cv.vec" - size 300 - negative 15 - threads 10 - iters 10
 
+WORD2VEC_PATH = 'word2vecf'
 COUNT_AND_FILTER = 'count_and_filter'
 WORD2VECF = 'word2vecf'
 
@@ -29,21 +30,23 @@ if __name__ == '__main__':
     word_vocab = f'{args.output}.cv.txt'
     context_vocab = f'{args.output}.wv.txt'
 
-    subprocess.call([COUNT_AND_FILTER, *it.chain.from_iterable({
-        '-train':       args.input,
-        '-wvocab':      f'{args.output}.cv.txt',
-        '-cvocab':      f'{args.output}.wv.txt',
-        '-min-count':   args.mincount,
-    }.items())])
+    subprocess.call([os.path.join(WORD2VEC_PATH, COUNT_AND_FILTER),
+                     *it.chain.from_iterable({
+                         '-train':       args.input,
+                         '-wvocab':      f'{args.output}.cv.txt',
+                         '-cvocab':      f'{args.output}.wv.txt',
+                         '-min-count':   str(args.mincount),
+                     }.items())])
 
-    subprocess.call([WORD2VECF, *it.chain.from_iterable({
-        '-train':       args.input,
-        '-wvocab':      f'{args.output}.cv.txt',
-        '-cvocab':      f'{args.output}.wv.txt',
-        '-output':      f'{args.output}.vec',
-        '-dumpcv':      f'{args.output}.cv.vec',
-        '-size':        args.size,
-        '-negative':    args.negative,
-        '-threads':     args.threads,
-        '-iters':       args.iters,
-    }.items())])
+    subprocess.call([os.path.join(WORD2VEC_PATH, WORD2VECF),
+                     *it.chain.from_iterable({
+                         '-train':       args.input,
+                         '-wvocab':      f'{args.output}.cv.txt',
+                         '-cvocab':      f'{args.output}.wv.txt',
+                         '-output':      f'{args.output}.vec',
+                         '-dumpcv':      f'{args.output}.cv.vec',
+                         '-size':        args.size,
+                         '-negative':    args.negative,
+                         '-threads':     args.threads,
+                         '-iters':       args.iters,
+                     }.items())])
