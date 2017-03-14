@@ -19,6 +19,7 @@
 #include <pthread.h>
 #include "vocab.h"
 #include "io.h"
+#include <stdlib.h>
 
 
 #define MAX_STRING 100
