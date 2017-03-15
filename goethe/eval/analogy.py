@@ -15,7 +15,7 @@ QUESTIONS = 'questions'  # number of questions in a section
 OOV = 'oov'  # out of vocabulary rate
 MODEL = 'model'  # name of models
 OUT_EXT = '.analogy'  # extension used for output files
-
+DEFAULT_QUESTIONS = ['evaluation/analogy/sem-question-words.txt', 'evaluation/analogy/syn-question-words.txt']
 
 def name(path):
     """Strip path and extension from name.
@@ -98,12 +98,16 @@ def combine_accuracy_dfs(model_dfs):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='Evaluate model and generate CSV with results')
-    parser.add_argument('-q', '--questions', nargs='+', required=True,
-                        help='questions file in word2vec format')
     parser.add_argument('-m', '--models', nargs='+', required=True,
                         help='one or more models to be evaluated')
-    parser.add_argument(
-        '-o', '--output', help='folder to write output files, omission will cause printing')
+    parser.add_argument('-q', '--questions', nargs='+', default=DEFAULT_QUESTIONS,
+                        help='questions file in word2vec format')
+    parser.add_argument('-o', '--output',
+                        help='folder to write output files, omission will cause printing')
+    parser.add_argument('-p', '--pretty-print', default=False, action='store_true', dest='pprint',
+                        help='Pretty print dataframe if no output file is provided.')
+    parser.add_argument('--no-header', default=True, action='store_false', dest='header',
+                        help='Omit header of Dataframe while saving or printing')
     parser.add_argument('-c', '--counts', default=False, action='store_true',
                         help='create an output file for each model containing the counts of correct/incorrect/total answers')
     args = parser.parse_args()
@@ -115,9 +119,11 @@ if __name__ == "__main__":
     if args.output:
         os.makedirs(args.output, exist_ok=True)
         path = os.path.join(args.output, f'{ACCURACY}{OUT_EXT}')
-        combined_df.round(3).to_csv(path, index_label=SECTION)
-    else:
+        combined_df.round(3).T.to_csv(path, index_label=SECTION, header=args.header)
+    elif args.pprint:
         print(combined_df)
+    else:
+        print(combined_df.T.to_csv(header=args.header))
 
     if args.counts:
         for df in model_dfs:
