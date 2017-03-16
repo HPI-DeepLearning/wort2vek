@@ -17,14 +17,14 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Word2vecf training')
     parser.add_argument('input', help='pairs file')
     parser.add_argument('output', help='name of outputted model')
-    parser.add_argument('-m', '--mincount', help='min count', default=100)
-    parser.add_argument('-s', '--size', help='word vector size', default=300)
+    parser.add_argument('-m', '--mincount', help='min count [100]', default=100)
+    parser.add_argument('-s', '--size', help='word vector size [300]', default=300)
     parser.add_argument('-n', '--negative',
-                        help='number of negative samples', default=15)
+                        help='number of negative samples [15]', default=15)
     parser.add_argument('-t', '--threads',
-                        help='number of threads', default=10)
+                        help='number of threads [10]', default=10)
     parser.add_argument(
-        '-i', '--iters', help='number of iterations', default=10)
+        '-i', '--iters', help='number of iterations [10]', default=10)
     args = parser.parse_args()
 
     word_vocab = f'{args.output}.cv.txt'
