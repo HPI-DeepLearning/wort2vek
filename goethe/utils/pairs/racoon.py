@@ -104,28 +104,30 @@ def word2vec(tokens, contextsize=5):
 
 
 def ptsort(start):
-    tokens = []
+    tdists = [0] * len(start.doc)
     queue = deque([start])
     seen = {start}
 
     def neighbors(token):
         is_head = token.dep_ == 'ROOT'
-        nbrs = it.chain(token.children, [] if is_head else [token.head])
-        return sorted(nbrs, key=lambda t: abs(t.i - start.i))
+        return it.chain(token.children, [] if is_head else [token.head])
 
     while queue:
         t = queue.popleft()
         nbrs = [n for n in neighbors(t) if n not in seen]
+        for n in nbrs:
+            tdists[n.i] = tdists[t.i] + 1
         queue.extend(nbrs)
-        tokens.extend(nbrs)
         seen.add(t)
 
+    tokens = (t for t in start.doc if t is not start)
+    tokens = sorted(tokens, key=lambda t: abs(t.i - start.i))
+    tokens = sorted(tokens, key=lambda t: tdists[t.i])
     return tokens
 
 
 def ptsort_pairs(doc):
     context_size = random.randint(1, len(doc) - 1)
-    print(f'CONTEXT: {context_size}')
 
     def per_token(token):
         pairs = zip(it.repeat(token), ptsort(token))
