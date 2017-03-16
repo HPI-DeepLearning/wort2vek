@@ -17,14 +17,14 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Word2vecf training')
     parser.add_argument('input', help='pairs file')
     parser.add_argument('output', help='name of outputted model')
-    parser.add_argument('-m', '--mincount', help='min count [100]', default=100)
-    parser.add_argument('-s', '--size', help='word vector size [300]', default=300)
+    parser.add_argument('-m', '--mincount', help='min count [100]', type=int, default=100)
+    parser.add_argument('-s', '--size', help='word vector size [300]', type=int, default=300)
     parser.add_argument('-n', '--negative',
-                        help='number of negative samples [15]', default=15)
+                        help='number of negative samples [15]', type=int, default=15)
     parser.add_argument('-t', '--threads',
-                        help='number of threads [10]', default=10)
+                        help='number of threads [10]', type=int, default=10)
     parser.add_argument(
-        '-i', '--iters', help='number of iterations [10]', default=10)
+        '-i', '--iters', help='number of iterations [10]', type=int, default=10)
     args = parser.parse_args()
 
     word_vocab = f'{args.output}.cv.txt'
@@ -45,8 +45,8 @@ if __name__ == '__main__':
                          '-cvocab':      f'{args.output}.wv.txt',
                          '-output':      f'{args.output}.vec',
                          '-dumpcv':      f'{args.output}.cv.vec',
-                         '-size':        args.size,
-                         '-negative':    args.negative,
-                         '-threads':     args.threads,
-                         '-iters':       args.iters,
+                         '-size':        str(args.size),
+                         '-negative':    str(args.negative),
+                         '-threads':     str(args.threads),
+                         '-iters':       str(args.iters),
                      }.items())])
