@@ -127,7 +127,7 @@ def ptsort(start):
 
 
 def ptsort_pairs(doc):
-    context_size = random.randint(1, len(doc) - 1)
+    context_size = random.randint(1, len(doc))
 
     def per_token(token):
         pairs = zip(it.repeat(token), ptsort(token))
