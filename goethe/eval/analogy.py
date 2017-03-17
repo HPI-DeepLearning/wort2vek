@@ -17,6 +17,7 @@ MODEL = 'model'  # name of models
 OUT_EXT = '.analogy'  # extension used for output files
 DEFAULT_QUESTIONS = ['evaluation/analogy/sem-question-words.txt', 'evaluation/analogy/syn-question-words.txt']
 
+
 def name(path):
     """Strip path and extension from name.
     """

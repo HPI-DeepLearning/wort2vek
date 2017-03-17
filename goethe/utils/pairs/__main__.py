@@ -4,17 +4,12 @@ import random
 import argparse
 from tqdm import tqdm
 import spacy
-from .squirrel import squirrel
+from squirrel import Squirrel
+
 
 LANG = 'de'
 BATCH_SIZE = 10000
 N_THREADS = 4
-
-
-def pairs(method, docs, chunksize=10000):
-    with mp.Pool(4) as pool:
-        yield from pool.imap(method, docs, chunksize)
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
@@ -36,10 +31,11 @@ if __name__ == '__main__':
     with open(input_file, 'r') as f:
         lines = (line.strip() for line in f)
         docs = nlp.pipe(lines, batch_size=BATCH_SIZE, n_threads=N_THREADS)
-        docs = tqdm(docs, total=count_lines(input_file))
+        # docs = tqdm(docs, total=count_lines(input_file))
+        squirrel = Squirrel(args.max_level)
         pairs = (pair
                  for doc in docs
-                 for pair in squirrel(doc, args.max_level))
+                 for pair in squirrel.pairs(doc))
         out = (word + ' ' + ctx for word, ctx in pairs)
 
         if args.output:
