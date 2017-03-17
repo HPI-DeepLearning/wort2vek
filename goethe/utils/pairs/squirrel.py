@@ -3,7 +3,7 @@ import random
 import itertools as it
 
 
-class Squirrel(object):
+class Squirrel:
     def __init__(self, max_level=3):
         self.max_level = max_level
 
@@ -27,7 +27,7 @@ class Squirrel(object):
 
     def word_context(self, word):
         candidates = deque()
-        seen = [word]
+        seen = {word}
 
         def add_to_queue(word, level):
             for w in it.chain(word.children, [word.head]):
@@ -39,7 +39,6 @@ class Squirrel(object):
         while candidates:
             level, candidate = candidates.popleft()
             if self.keep(candidate, level):
-                print('keep')
                 yield candidate
             if level < self.max_level:
                 add_to_queue(candidate, level + 1)
