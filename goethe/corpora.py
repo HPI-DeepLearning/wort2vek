@@ -45,6 +45,13 @@ class Corpus:
         file = ('%s.tokens.txt' if use_tokens else '%s.txt') % corpus_name
         return os.path.join(self.path, file)
 
+    def count(self):
+        """Count number of sentences.
+        """
+        for i, _ in enumerate(self):
+            pass
+        return i + 1
+
     def random(self, k, tokens=True):
         """Randomly select a list of k token lists.
         (Will load k elements into memory!)
