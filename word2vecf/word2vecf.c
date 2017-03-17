@@ -159,6 +159,7 @@ void *TrainModelThread(void *id) {
         word_count++; //TODO ?
         if (wrdi < 0 || ctxi < 0) continue;
 
+        // SUBSAMPLING
         if (sample > 0) {
            real ran = (sqrt(wv->vocab[wrdi].cn / (sample * wv->word_count)) + 1) * (sample * wv->word_count) / wv->vocab[wrdi].cn;
            next_random = next_random * (unsigned long long)25214903917 + 11;

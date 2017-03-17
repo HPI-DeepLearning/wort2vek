@@ -21,6 +21,8 @@ if __name__ == '__main__':
     parser.add_argument('-s', '--size', help='word vector size [300]', type=int, default=300)
     parser.add_argument('-n', '--negative',
                         help='number of negative samples [15]', type=int, default=15)
+    parser.add_argument('-sub', '--subsample', type=str, default='1e-5',
+                        help='Set threshold for frequency of words. Those that appear with higher frequency in the training data will be randomly down-sampled [1e-5]')
     parser.add_argument('-t', '--threads',
                         help='number of threads [10]', type=int, default=10)
     parser.add_argument(
@@ -47,6 +49,7 @@ if __name__ == '__main__':
                          '-dumpcv':      f'{args.output}.cv.vec',
                          '-size':        str(args.size),
                          '-negative':    str(args.negative),
+                         '-sample':      args.subsample,
                          '-threads':     str(args.threads),
                          '-iters':       str(args.iters),
                      }.items())])
