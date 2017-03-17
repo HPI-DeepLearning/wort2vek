@@ -30,7 +30,6 @@ if __name__ == '__main__':
 
     with open(args.input) as inf:
         lines = (l.strip() for l in inf)
-        lines = it.islice(lines, 10)
         docs = nlp.pipe(lines, batch_size=BATCH_SIZE, n_threads=N_THREADS)
         pairsgen = methods[args.method](args).pairs
         pairs = (f'{word} {context}\n'
