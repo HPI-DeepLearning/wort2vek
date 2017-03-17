@@ -31,7 +31,7 @@ class Racoon:
         return tokens
 
     @classmethod
-    def ptsort_pairs(cls, doc):
+    def pairs(cls, doc):
         context_size = random.randint(1, len(doc))
 
         def per_token(token):
@@ -40,10 +40,3 @@ class Racoon:
 
         for t in doc:
             yield from per_token(t)
-
-    @classmethod
-    def pairs(cls, corpus):
-        nlp = spacy.load('de')
-        docs = nlp.pipe(corpus.sents(), batch_size=100_000, n_threads=8)
-        for d in docs:
-            yield from cls.ptsort_pairs(d)
