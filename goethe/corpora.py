@@ -1,5 +1,5 @@
 import os
-from . import util
+from . import utils
 import itertools as it
 
 
@@ -49,4 +49,4 @@ class Corpus:
         """Randomly select a list of k token lists.
         (Will load k elements into memory!)
         """
-        return util.rsample(self.tokens() if tokens else self.sents(), k)
+        return utils.rsample(self.tokens() if tokens else self.sents(), k)
