@@ -5,8 +5,8 @@ import argparse
 import sys
 from tqdm import tqdm
 import spacy
-from .squirrel import Squirrel
-from .racoon import Racoon
+from squirrel import Squirrel
+from racoon import Racoon
 
 
 LANG = 'de'

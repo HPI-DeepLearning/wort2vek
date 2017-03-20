@@ -46,5 +46,4 @@ class Squirrel:
     def pairs(self, doc):
         for word in doc:
             for ctx in self.word_context(word):
-                print(ctx)
                 yield (word.text, ctx.text)
