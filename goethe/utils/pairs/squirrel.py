@@ -4,7 +4,7 @@ import itertools as it
 
 
 class Squirrel:
-    def __init__(self, max_level=3):
+    def __init__(self, max_level=3, **kwargs):
         self.max_level = max_level
 
     def word_prob(self, word):
