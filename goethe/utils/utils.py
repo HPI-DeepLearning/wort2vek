@@ -18,3 +18,9 @@ def rsample(iterator, k):
 
     random.shuffle(sample)
     return sample
+
+
+def args_to_kwargs(args):
+    return {k: v
+            for k, v in vars(args).items()
+            if v is not None}
