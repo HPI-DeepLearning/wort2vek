@@ -10,7 +10,7 @@ class Racoon:
         self.window = window
 
     @staticmethod
-    def ptsort(start):
+    def context(start):
         tdists = [0] * len(start.doc)
         queue = deque([start])
         seen = {start}
@@ -34,13 +34,9 @@ class Racoon:
         return tokens
 
     def pairs(self, doc):
-
-        def per_token(token):
-            context = self.ptsort(token)
-            pairs = zip(it.repeat(token), context)
-            return it.islice(pairs, self.window)
-
-        return it.chain.from_iterable(per_token(t) for t in doc)
+        for token in doc:
+            context = (c.text for c in self.context(token))
+            yield token.text, list(it.islice(context, self.window))
 
 
 class POSRacoon(Racoon):
@@ -52,6 +48,32 @@ class POSRacoon(Racoon):
                     (lambda t: t.pos_))
 
     def pairs(self, doc):
-        pairs = super().pairs(doc)
-        return ((t.text, f'{c.text}/{self.pos(c)}')
-                for t, c in pairs)
+        for token, context in super().pairs(doc):
+            yield token.text, [f'{c.text}/{self.pos(c)}' for c in context]
+
+
+class MinRacoon(Racoon):
+
+    @staticmethod
+    def context(start):
+        tdists = [0] * len(start.doc)
+        queue = deque([start])
+        seen = {start}
+
+        def neighbors(token):
+            is_head = token.dep_ == 'ROOT'
+            return it.chain(token.children, [] if is_head else [token.head])
+
+        while queue:
+            t = queue.popleft()
+            nbrs = [n for n in neighbors(t)
+                    if n not in seen]
+            for n in nbrs:
+                tdists[n.i] = tdists[t.i] + 1
+            seen.update(nbrs)
+            queue.extend(nbrs)
+
+        tokens = (t for t in start.doc if t is not start)
+        tokens = sorted(tokens,
+                        key=lambda t: min(tdists[t.i], abs(t.i - start.i)))
+        return tokens

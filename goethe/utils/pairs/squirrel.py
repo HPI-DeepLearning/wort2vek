@@ -25,7 +25,7 @@ class Squirrel:
         # dep_prob = self.dep_prob(word.dep_)
         return random.random() < level_prob
 
-    def word_context(self, word):
+    def context(self, word):
         candidates = deque()
         seen = {word}
 
@@ -44,6 +44,6 @@ class Squirrel:
                 add_to_queue(candidate, level + 1)
 
     def pairs(self, doc):
-        for word in doc:
-            for ctx in self.word_context(word):
-                yield (word.text, ctx.text)
+        for token in doc:
+            context = self.context(token)
+            yield token, list(context)

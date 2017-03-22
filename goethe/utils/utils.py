@@ -24,3 +24,10 @@ def args_to_kwargs(args):
     return {k: v
             for k, v in vars(args).items()
             if v is not None}
+
+
+def chunks(l, chunks):
+    """Yield `chunks` successive chunks from l."""
+    n = int(len(l) / chunks)
+    for i in range(0, len(l), n):
+        yield l[i:i + n]
