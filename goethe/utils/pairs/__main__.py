@@ -14,7 +14,7 @@ from ..utils import args_to_kwargs, chunks
 LANG = 'de'
 BATCH_SIZE = 1000
 N_THREADS = 4
-PROCESSES = 2
+PROCESSES = 16
 
 
 methods = {'squirrel': Squirrel,
