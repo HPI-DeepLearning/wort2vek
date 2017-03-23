@@ -4,21 +4,22 @@ import multiprocessing as mp
 import random
 import argparse
 import spacy
-from .window import Window
+# from .window import Window
 # from .squirrel import Squirrel
 from .methods import Racoon, POSRacoon, MinRacoon, Squirrel
-from ..utils import args_to_kwargs, ichunks, smart_open
+from ..utils import args_to_kwargs, chunks, smart_open, iterlen
+
 
 LANG = 'de'
 BATCH_SIZE = 10000
-N_THREADS = 2
-PROCESSES = 1
+N_THREADS = 4
+PROCESSES = 8
 
 
 methods = {'squirrel': Squirrel,
            'racoon': Racoon,
            'posracoon': POSRacoon,
-           'window': Window,
+           #    'window': Window,
            'minracoon': MinRacoon}
 
 
@@ -28,7 +29,8 @@ def contexts_for_lines(lines, method):
     else:
         nlp = spacy.load(LANG, parser=False)
     docs = nlp.pipe(lines, batch_size=BATCH_SIZE, n_threads=N_THREADS)
-    return list(it.chain(method.lines(doc) for doc in docs))
+    return list(it.chain.from_iterable(method.lines(doc) for doc in docs))
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Create pairs file')
@@ -44,12 +46,14 @@ if __name__ == '__main__':
     kwargs = args_to_kwargs(args)
     method = methods[args.method.lower()](**kwargs)
 
-
-    with open(args.input) as inf, smart_open(args.output) as outf, mp.Pool(8) as pool:
+    with open(args.input) as inf, \
+            smart_open(args.output) as outf, \
+            mp.Pool(PROCESSES) as pool:
+        input_length = iterlen(inf)
+        inf.seek(0)
         lines = (l.strip() for l in inf)
-
         for contexts in pool.map(ft.partial(contexts_for_lines, method=method),
-                                 ichunks(lines, PROCESSES),
+                                 chunks(lines, input_length, PROCESSES),
                                  chunksize=1):
             outputlines = (' '.join(context) + '\n'
                            for context in contexts)

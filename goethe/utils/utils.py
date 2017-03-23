@@ -1,7 +1,7 @@
-import random
 import sys
+import random
 import contextlib
-import itertools
+import itertools as it
 
 
 def rsample(iterator, k):
@@ -29,20 +29,19 @@ def args_to_kwargs(args):
             if v is not None}
 
 
-def chunks(l, chunks):
-    """Yield `chunks` successive chunks from l."""
-    n = int(len(l) / chunks)
-    for i in range(0, len(l), n):
-        yield l[i:i + n]
+def chunks(lines, length, chunks):
+    """Yield `chunks` successive chunks from iterable.
+    """
+    chunksize = int(length / chunks)
+    iterator = iter(lines)
+    for i in range(0, length, chunksize):
+        yield list(it.islice(iterator, chunksize))
 
 
-def ichunks(iterable, n):
-    it = iter(iterable)
-    while True:
-        chunk = itertools.islice(it, n)
-        if not chunk:
-            return
-        yield chunk
+def iterlen(f):
+    for i, _ in enumerate(f):
+        pass
+    return i + 1
 
 
 @contextlib.contextmanager
