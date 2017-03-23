@@ -41,15 +41,22 @@ class Racoon:
 
 class POSRacoon(Racoon):
 
+    @staticmethod
+    def fine(token):
+        return token.tag_
+
+    @staticmethod
+    def coarse(token):
+        return token.pos_
+
     def __init__(self, fine=False, **kwargs):
         super().__init__(**kwargs)
-        self.pos = ((lambda t: t.tag_)
-                    if fine else
-                    (lambda t: t.pos_))
+        self.pos = (self.fine if fine else self.coarse)
 
     def pairs(self, doc):
-        for token, context in super().pairs(doc):
-            yield token.text, [f'{c.text}/{self.pos(c)}' for c in context]
+        for token in doc:
+            context = (f'{c.text}/{self.pos(c)}' for c in self.context(token))
+            yield token.text, list(it.islice(context, self.window))
 
 
 class MinRacoon(Racoon):
