@@ -45,5 +45,5 @@ class Squirrel:
 
     def pairs(self, doc):
         for token in doc:
-            context = self.context(token)
-            yield token, list(context)
+            context = (c.text for c in self.context(token))
+            yield token.text, list(context)
