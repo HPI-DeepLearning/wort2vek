@@ -12,7 +12,7 @@ from ..utils import args_to_kwargs, chunks, smart_open, iterlen
 
 LANG = 'de'
 BATCH_SIZE = 10000
-N_THREADS = 4
+N_THREADS = 8
 
 methods = {'squirrel': Squirrel,
            'racoon': Racoon,
@@ -49,15 +49,12 @@ if __name__ == '__main__':
     method = methods[args.method.lower()](**kwargs)
 
     with open(args.input) as inf, \
-            smart_open(args.output) as outf, \
-            mp.Pool(processes) as pool:
+            smart_open(args.output) as outf:
         input_length = iterlen(inf)
         print(f'Total length: {input_length}')
         inf.seek(0)
         lines = (l.strip() for l in inf)
-        for contexts in pool.imap_unordered(ft.partial(contexts_for_lines, method=method),
-                                            chunks(lines, input_length, processes * 8),
-                                            chunksize=1):
+        for contexts in contexts_for_lines(lines, method):
             print(f'Finished chunk of size {len(contexts)}')
             outputlines = (' '.join(context) + '\n'
                            for context in contexts)
