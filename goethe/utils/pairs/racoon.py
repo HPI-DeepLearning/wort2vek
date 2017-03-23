@@ -6,6 +6,8 @@ import spacy
 
 class Racoon:
 
+    PARSE_TREE = True
+
     def __init__(self, window=None, **kwargs):
         self.window = window
 
@@ -33,7 +35,7 @@ class Racoon:
         tokens = sorted(tokens, key=lambda t: tdists[t.i])
         return tokens
 
-    def pairs(self, doc):
+    def token_list(self, doc):
         for token in doc:
             context = (c.text for c in self.context(token))
             yield token.text, list(it.islice(context, self.window))
@@ -53,7 +55,7 @@ class POSRacoon(Racoon):
         super().__init__(**kwargs)
         self.pos = (self.fine if fine else self.coarse)
 
-    def pairs(self, doc):
+    def token_list(self, doc):
         for token in doc:
             context = (f'{c.text}/{self.pos(c)}' for c in self.context(token))
             yield token.text, list(it.islice(context, self.window))

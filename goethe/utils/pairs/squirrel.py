@@ -4,6 +4,9 @@ import itertools as it
 
 
 class Squirrel:
+
+    PARSE_TREE = True
+
     def __init__(self, max_level=3, **kwargs):
         self.max_level = max_level
 
@@ -43,7 +46,7 @@ class Squirrel:
             if level < self.max_level:
                 add_to_queue(candidate, level + 1)
 
-    def pairs(self, doc):
+    def token_list(self, doc):
         for token in doc:
             context = (c.text for c in self.context(token))
             yield token.text, list(context)
