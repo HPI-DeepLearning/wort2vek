@@ -6,26 +6,27 @@ import argparse
 import sys
 from tqdm import tqdm
 import spacy
-from .squirrel import Squirrel
-from .racoon import Racoon, POSRacoon
+# from .squirrel import Squirrel
+from .methods import Racoon, POSRacoon, MinRacoon, Squirrel
 from ..utils import args_to_kwargs, chunks
 
 
 LANG = 'de'
-BATCH_SIZE = 1000
+BATCH_SIZE = 10000
 N_THREADS = 2
 PROCESSES = 16
 
 
 methods = {'squirrel': Squirrel,
            'racoon': Racoon,
-           'posracoon': POSRacoon}
+           'posracoon': POSRacoon,
+           'minracoon': MinRacoon}
 
 
-def pairs_for_lines(lines, method):
+def contexts_for_lines(lines, method):
     nlp = spacy.load(LANG)
     docs = nlp.pipe(lines, batch_size=BATCH_SIZE, n_threads=N_THREADS)
-    return list(it.chain.from_iterable(method.pairs(doc) for doc in docs))
+    return list(it.chain(method.lines(doc) for doc in docs))
 
 
 if __name__ == '__main__':
@@ -34,7 +35,7 @@ if __name__ == '__main__':
     parser.add_argument('-o', '--output', required=True)
     parser.add_argument('-m', '--method',
                         choices=methods.keys(), required=True)
-    parser.add_argument('--max_level', type=int, default=3)
+    # parser.add_argument('--max_level', type=int, default=3)
     parser.add_argument('--window', type=int)
     parser.add_argument('--fine', action='store_true')
 
@@ -44,12 +45,9 @@ if __name__ == '__main__':
 
     with open(args.input) as inf, open(args.output, 'w') as outf, mp.Pool(8) as pool:
         lines = [l.strip() for l in inf]
-        for pairs in pool.map(ft.partial(pairs_for_lines, method=method),
-                              chunks(lines, PROCESSES),
-                              chunksize=1):
-            outputlines = [' '.join(it.chain([token], context)) + '\n'
-                           for token, context in pairs]
-            if args.output:
-                outf.writelines(outputlines)
-            else:
-                sys.stdout.writelines(outputlines)
+        for contexts in pool.map(ft.partial(contexts_for_lines, method=method),
+                                 chunks(lines, PROCESSES),
+                                 chunksize=1):
+            outputlines = (' '.join(context) + '\n'
+                           for context in contexts)
+            outf.writelines(outputlines)
