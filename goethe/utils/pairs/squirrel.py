@@ -46,7 +46,7 @@ class Squirrel:
             if level < self.max_level:
                 add_to_queue(candidate, level + 1)
 
-    def token_list(self, doc):
+    def lines(self, doc):
         for token in doc:
             context = (c.text for c in self.context(token))
             yield token.text, list(context)

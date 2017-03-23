@@ -1,4 +1,7 @@
 import random
+import sys
+import contextlib
+import itertools
 
 
 def rsample(iterator, k):
@@ -31,3 +34,26 @@ def chunks(l, chunks):
     n = int(len(l) / chunks)
     for i in range(0, len(l), n):
         yield l[i:i + n]
+
+
+def ichunks(iterable, n):
+    it = iter(iterable)
+    while True:
+        chunk = itertools.islice(it, n)
+        if not chunk:
+            return
+        yield chunk
+
+
+@contextlib.contextmanager
+def smart_open(filename=None):
+    if filename and filename != '-':
+        fh = open(filename, 'w')
+    else:
+        fh = sys.stdout
+
+    try:
+        yield fh
+    finally:
+        if fh is not sys.stdout:
+            fh.close()
