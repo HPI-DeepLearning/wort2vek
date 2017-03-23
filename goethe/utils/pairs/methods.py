@@ -40,21 +40,22 @@ class Racoon:
         return tokens
 
     def apply_context(self, context):
-        context = [c.text for c in context]
+        context = (c.text for c in context)
         return it.islice(context, self.window)
 
     def tokencontext(self, doc):
         for token in doc:
-            context = self.apply_context(self.context(token))
+            context = self.context(token)
+            context = self.apply_context(context)
             yield token.text, list(context)
 
     def pairs(self, doc):
-        for token, contexts in self.tokencontext(doc):
-            yield zip(it.repeat(token), contexts)
+        for token, context in self.tokencontext(doc):
+            yield list(zip(it.repeat(token), context))
 
     def lines(self, doc):
-        for token, contexts in self.tokencontext(doc):
-            yield it.chain([token], contexts)
+        for token, context in self.tokencontext(doc):
+            yield list(it.chain([token], context))
 
 
 class POSRacoon(Racoon):
