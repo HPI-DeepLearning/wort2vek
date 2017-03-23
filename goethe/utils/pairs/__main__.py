@@ -3,17 +3,15 @@ import functools as ft
 import multiprocessing as mp
 import random
 import argparse
-import sys
-from tqdm import tqdm
 import spacy
 # from .squirrel import Squirrel
 from .methods import Racoon, POSRacoon, MinRacoon, Squirrel
-from ..utils import args_to_kwargs, chunks
+from ..utils import args_to_kwargs, chunks, openfileorstdout
 
 
 LANG = 'de'
 BATCH_SIZE = 10000
-N_THREADS = 2
+N_THREADS = 4
 PROCESSES = 16
 
 
@@ -32,7 +30,7 @@ def contexts_for_lines(lines, method):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Create pairs file')
     parser.add_argument('-i', '--input', required=True)
-    parser.add_argument('-o', '--output', required=True)
+    parser.add_argument('-o', '--output')
     parser.add_argument('-m', '--method',
                         choices=methods.keys(), required=True)
     # parser.add_argument('--max_level', type=int, default=3)
@@ -43,7 +41,9 @@ if __name__ == '__main__':
     kwargs = args_to_kwargs(args)
     method = methods[args.method.lower()](**kwargs)
 
-    with open(args.input) as inf, open(args.output, 'w') as outf, mp.Pool(8) as pool:
+    with open(args.input) as inf, \
+            openfileorstdout(args.output) as outf, \
+            mp.Pool(8) as pool:
         lines = [l.strip() for l in inf]
         for contexts in pool.map(ft.partial(contexts_for_lines, method=method),
                                  chunks(lines, PROCESSES),

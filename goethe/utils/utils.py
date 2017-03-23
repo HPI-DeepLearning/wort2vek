@@ -1,4 +1,6 @@
 import random
+import contextlib
+import sys
 
 
 def rsample(iterator, k):
@@ -31,3 +33,16 @@ def chunks(l, chunks):
     n = int(len(l) / chunks)
     for i in range(0, len(l), n):
         yield l[i:i + n]
+
+
+@contextlib.contextmanager
+def openfileorstdout(output=None):
+    if output is None:
+        f = sys.stdout
+    else:
+        f = open(output, 'w')
+    try:
+        yield f
+    finally:
+        if f is not sys.stdout:
+            f.close()
