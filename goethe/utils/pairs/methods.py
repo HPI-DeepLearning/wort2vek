@@ -50,11 +50,11 @@ class Racoon:
 
     def pairs(self, doc):
         for token, contexts in self.tokencontext(doc):
-            return zip(it.repeat(token), contexts)
+            yield zip(it.repeat(token), contexts)
 
     def lines(self, doc):
         for token, contexts in self.tokencontext(doc):
-            return it.chain([token], contexts)
+            yield it.chain([token], contexts)
 
 
 class POSRacoon(Racoon):

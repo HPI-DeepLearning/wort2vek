@@ -3,8 +3,6 @@ import functools as ft
 import multiprocessing as mp
 import random
 import argparse
-import sys
-from tqdm import tqdm
 import spacy
 from .window import Window
 # from .squirrel import Squirrel
@@ -45,6 +43,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     kwargs = args_to_kwargs(args)
     method = methods[args.method.lower()](**kwargs)
+
 
     with open(args.input) as inf, smart_open(args.output) as outf, mp.Pool(8) as pool:
         lines = (l.strip() for l in inf)

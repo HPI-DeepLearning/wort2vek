@@ -1,7 +1,12 @@
 import random
+<<<<<<< HEAD
 import sys
 import contextlib
 import itertools
+=======
+import contextlib
+import sys
+>>>>>>> 259f096f3c062a38db6b32273f72d8a332248f8c
 
 
 def rsample(iterator, k):
