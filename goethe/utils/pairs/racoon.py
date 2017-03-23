@@ -1,12 +1,12 @@
 import itertools as it
-from collections import namedtuple, deque
+from collections import deque
 import random
 import spacy
 
 
 class Racoon:
 
-    def __init__(self, window=5, **kwargs):
+    def __init__(self, window=None, **kwargs):
         self.window = window
 
     @staticmethod
