@@ -26,10 +26,9 @@ def contexts_for_lines(lines, method):
     #     nlp = spacy.load(LANG)
     # else:
     #     nlp = spacy.load(LANG, parser=False)
-    print(f'Received {len(lines)} lines')
     nlp = spacy.load(LANG, parser=False)
     docs = nlp.pipe(lines, batch_size=BATCH_SIZE, n_threads=N_THREADS)
-    return list(it.chain.from_iterable(method.lines(doc) for doc in docs))
+    return (method.lines(doc) for doc in docs)
 
 
 if __name__ == '__main__':
@@ -50,12 +49,7 @@ if __name__ == '__main__':
 
     with open(args.input) as inf, \
             smart_open(args.output) as outf:
-        input_length = iterlen(inf)
-        print(f'Total length: {input_length}')
-        inf.seek(0)
         lines = (l.strip() for l in inf)
-        for contexts in contexts_for_lines(lines, method):
-            print(f'Finished chunk of size {len(contexts)}')
-            outputlines = (' '.join(context) + '\n'
-                           for context in contexts)
-            outf.writelines(outputlines)
+        lists = contexts_for_lines(lines, method)
+        outputlines = (' '.join(context) + '\n' for context in contexts)
+        outf.writelines(outputlines)
