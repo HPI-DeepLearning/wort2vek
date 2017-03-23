@@ -44,13 +44,10 @@ if __name__ == '__main__':
     kwargs = args_to_kwargs(args)
     method = methods[args.method.lower()](**kwargs)
 
-
-    with open(args.input) as inf, smart_open(args.output) as outf, mp.Pool(8) as pool:
+    with open(args.input) as inf, smart_open(args.output) as outf:
         lines = (l.strip() for l in inf)
 
-        for contexts in pool.map(ft.partial(contexts_for_lines, method=method),
-                                 ichunks(lines, PROCESSES),
-                                 chunksize=1):
+        for contexts in contexts_for_lines(lines, method):
             outputlines = (' '.join(context) + '\n'
                            for context in contexts)
             outf.writelines(outputlines)
