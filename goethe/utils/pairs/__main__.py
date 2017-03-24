@@ -50,6 +50,6 @@ if __name__ == '__main__':
     with open(args.input) as inf, \
             smart_open(args.output) as outf:
         lines = (l.strip() for l in inf)
-        lists = contexts_for_lines(lines, method)
+        contexts = contexts_for_lines(lines, method)
         outputlines = (' '.join(context) + '\n' for context in contexts)
         outf.writelines(outputlines)
