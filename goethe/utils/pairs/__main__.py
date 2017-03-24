@@ -22,11 +22,10 @@ methods = {'squirrel': Squirrel,
 
 
 def contexts_for_lines(lines, method):
-    # if method.PARSE_TREE:
-    #     nlp = spacy.load(LANG)
-    # else:
-    #     nlp = spacy.load(LANG, parser=False)
-    nlp = spacy.load(LANG, parser=False)
+    if method.PARSE_TREE:
+        nlp = spacy.load(LANG)
+    else:
+        nlp = spacy.load(LANG, parser=False)
     docs = nlp.pipe(lines, batch_size=BATCH_SIZE, n_threads=N_THREADS)
     for doc in docs:
         yield from method.lines(doc)
@@ -45,7 +44,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
     processes = args.processes
     kwargs = args_to_kwargs(args)
-    print('run method: ' + args.method)
     method = methods[args.method.lower()](**kwargs)
 
     with open(args.input) as inf, smart_open(args.output) as outf:
