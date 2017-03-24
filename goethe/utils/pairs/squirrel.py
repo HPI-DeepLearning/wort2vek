@@ -49,4 +49,4 @@ class Squirrel:
     def lines(self, doc):
         for token in doc:
             context = (c.text for c in self.context(token))
-            yield token.text, list(context)
+            yield [token.text] + list(context)

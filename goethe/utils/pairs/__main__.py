@@ -45,6 +45,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     processes = args.processes
     kwargs = args_to_kwargs(args)
+    print('run method: ' + args.method)
     method = methods[args.method.lower()](**kwargs)
 
     with open(args.input) as inf, \
