@@ -21,7 +21,7 @@ class Window:
     def lines(self, doc):
         tokens = [t.text for t in doc]
         for i in range(len(tokens)):
-            yield tokens[i] + self.window_sort(tokens, i)
+            yield [tokens[i]]s + self.window_sort(tokens, i)
 
 
 if __name__ == '__main__':
