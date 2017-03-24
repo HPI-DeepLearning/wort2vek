@@ -28,8 +28,8 @@ def contexts_for_lines(lines, method):
     #     nlp = spacy.load(LANG, parser=False)
     nlp = spacy.load(LANG, parser=False)
     docs = nlp.pipe(lines, batch_size=BATCH_SIZE, n_threads=N_THREADS)
-    return (method.lines(doc) for doc in docs)
-
+    for doc in docs:
+        yield from method.lines(doc)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Create pairs file')
@@ -48,8 +48,7 @@ if __name__ == '__main__':
     print('run method: ' + args.method)
     method = methods[args.method.lower()](**kwargs)
 
-    with open(args.input) as inf, \
-            smart_open(args.output) as outf:
+    with open(args.input) as inf, smart_open(args.output) as outf:
         lines = (l.strip() for l in inf)
         contexts = contexts_for_lines(lines, method)
         outputlines = (' '.join(context) + '\n' for context in contexts)
