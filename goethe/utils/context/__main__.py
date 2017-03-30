@@ -4,9 +4,7 @@ import multiprocessing as mp
 import random
 import argparse
 import spacy
-from .window import Window
-from .squirrel import Squirrel
-from .methods import Racoon, POSRacoon, MinRacoon, Squirrel
+from .methods import *
 from ..utils import args_to_kwargs, chunks, smart_open, iterlen
 
 
@@ -14,11 +12,12 @@ LANG = 'de'
 BATCH_SIZE = 10000
 N_THREADS = 8
 
-methods = {'squirrel': Squirrel,
-           'racoon': Racoon,
-           'posracoon': POSRacoon,
-           'window': Window,
-           'minracoon': MinRacoon}
+methods = {'ttraverse': TreeTraverse,
+           'torder': TreeOrder,
+           'tposorder': POSTreeOrder,
+           'tminorder': MinTreeOrder,
+           'tshuffleorder': ShuffleTreeOrder,
+           'linear': Linear}
 
 
 def contexts_for_sents(sents, method, pairs=False):
