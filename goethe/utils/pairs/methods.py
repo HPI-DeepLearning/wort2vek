@@ -49,7 +49,7 @@ class Racoon:
 
     def pairs(self, doc):
         for token, context in self.tokencontext(doc):
-            yield list(zip(it.repeat(token), context))
+            yield from zip(it.repeat(token), context)
 
     def lines(self, doc):
         for token, context in self.tokencontext(doc):
