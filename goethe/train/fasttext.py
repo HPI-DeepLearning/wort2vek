@@ -5,7 +5,6 @@ import argparse
 Reference: https://github.com/salestock/fastText.py
 """
 
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Fasttext training')
     parser.add_argument('--input_file', type=str,
