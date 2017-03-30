@@ -5,9 +5,7 @@ import itertools as it
 
 class Squirrel:
 
-    PARSE_TREE = True
-
-    def __init__(self, max_level=3, **kwargs):
+    def __init__(self, max_level, **kwargs):
         self.max_level = max_level
 
     def word_prob(self, word):

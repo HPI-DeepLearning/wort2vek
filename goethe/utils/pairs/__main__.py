@@ -22,27 +22,23 @@ methods = {'squirrel': Squirrel,
 
 
 def contexts_for_lines(lines, method):
-    if method.PARSE_TREE:
-        nlp = spacy.load(LANG)
-    else:
-        nlp = spacy.load(LANG, parser=False)
+    nlp = spacy.load(LANG)
     docs = nlp.pipe(lines, batch_size=BATCH_SIZE, n_threads=N_THREADS)
     for doc in docs:
         yield from method.lines(doc)
 
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Create pairs file')
     parser.add_argument('-i', '--input', required=True)
+    parser.add_argument('-m', '--method', required=True,
+                        choices=methods.keys())
     parser.add_argument('-o', '--output')
-    parser.add_argument('-m', '--method',
-                        choices=methods.keys(), required=True)
-    # parser.add_argument('--max_level', type=int, default=3)
+    parser.add_argument('--max_level', type=int, default=3)
     parser.add_argument('--window', type=int)
-    parser.add_argument('-p', '--processes', type=int, default=1)
     parser.add_argument('--fine', action='store_true')
 
     args = parser.parse_args()
-    processes = args.processes
     kwargs = args_to_kwargs(args)
     method = methods[args.method.lower()](**kwargs)
 

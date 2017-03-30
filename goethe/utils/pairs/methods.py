@@ -6,8 +6,6 @@ import spacy
 
 class Racoon:
 
-    PARSE_TREE = True
-
     def __init__(self, window=None, **kwargs):
         self.window = window
 
