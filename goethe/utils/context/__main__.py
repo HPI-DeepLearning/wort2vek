@@ -17,7 +17,8 @@ methods = {'ttraverse': TreeTraverse,
            'tposorder': POSTreeOrder,
            'tminorder': MinTreeOrder,
            'tshuffleorder': ShuffleTreeOrder,
-           'linear': Linear}
+           'linear': Linear,
+           'levygoldberg': LevyGoldberg}
 
 
 def contexts_for_sents(sents, method, pairs=False):

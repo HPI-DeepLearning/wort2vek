@@ -172,6 +172,25 @@ class TreeTraverse(ContextMethod):
                 add_to_queue(candidate, level + 1)
 
 
+class LevyGoldberg:
+
+    def __init__(self, **kwargs):
+        pass
+
+    def pairs(self, doc):
+        """Go over each word in `context` and get its text.
+        """
+        for token in doc:
+            if token.dep_ == 'ROOT':
+                continue
+            head = token.head
+            yield (head.text, f'{token.text}/{token.dep_}')
+            yield (token.text, f'{head.text}/{token.dep_}-1')
+
+    def lines(self, doc):
+        raise NotImplementedError
+
+
 class Linear(ContextMethod):
 
     def window_sort(self, tokens, n):
