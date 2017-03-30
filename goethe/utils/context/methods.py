@@ -71,7 +71,7 @@ class TreeOrder(ContextMethod):
             seen.update(nbrs)
             queue.extend(nbrs)
 
-        tokens = (t for t in start.doc if t is not start)
+        tokens = (t for t in seen if t is not start)
         tokens = self.contextsort(tokens, tdists, start)
         return tokens
 
@@ -135,24 +135,6 @@ class TreeTraverse(ContextMethod):
         super().__init__(**kwargs)
         self.max_level = max_level
 
-    def word_prob(self, word):
-        return 1
-
-    def dep_prob(self, dep_name):
-        return 1
-
-    def inv_level_prob(self, level):
-        return 1 / level
-
-    def word2vec_window_prob(self, level):
-        return (self.max_level - level + 1) / self.max_level
-
-    def keep(self, word, level):
-        level_prob = self.word2vec_window_prob(level)
-        # word_prob = self.word_prob(word)
-        # dep_prob = self.dep_prob(word.dep_)
-        return random.random() < level_prob
-
     def context(self, word):
         candidates = deque()
         seen = {word}
@@ -166,8 +148,7 @@ class TreeTraverse(ContextMethod):
         add_to_queue(word, 1)
         while candidates:
             level, candidate = candidates.popleft()
-            if self.keep(candidate, level):
-                yield candidate
+            yield candidate
             if level < self.max_level:
                 add_to_queue(candidate, level + 1)
 
