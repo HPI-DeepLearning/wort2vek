@@ -163,11 +163,6 @@ dkms.conf
 *.hg
 *.hg/*
 
-# compiled files
-word2vecf/distance
-word2vecf/word2vecf
-word2vecf/word2vec
-word2vecf/word2phrase
-word2vecf/word-analogy
-word2vecf/count_and_filter
-word2vecf/compute-accuracy
+# Tools (word2vecf, ...)
+tools/*
+!tools/.gitkeep
