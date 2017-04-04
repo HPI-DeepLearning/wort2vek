@@ -3,6 +3,8 @@ import argparse
 from collections import defaultdict
 import gensim.models.keyedvectors
 import pandas as pd
+import multiprocessing as mp
+import functools as ft
 
 # Names used in output files
 CORRECT = 'correct'  # correctly answered questions
@@ -15,7 +17,8 @@ QUESTIONS = 'questions'  # number of questions in a section
 OOV = 'oov'  # out of vocabulary rate
 MODEL = 'model'  # name of models
 OUT_EXT = '.analogy'  # extension used for output files
-DEFAULT_QUESTIONS = ['evaluation/analogy/sem-question-words.txt', 'evaluation/analogy/syn-question-words.txt']
+DEFAULT_QUESTIONS = ['evaluation/analogy/sem-question-words.txt',
+                     'evaluation/analogy/syn-question-words.txt']
 
 
 def name(path):
@@ -58,7 +61,8 @@ def accuracy_df(model, questions):
                 .accuracy(questions))
 
     def collapse_section(s):
-        """Take section and return results as dictionary."""
+        """Take section and return results as dictionary.
+        """
         section_name = s['section']
         correct = len(s['correct'])
         incorrect = len(s['incorrect'])
@@ -113,14 +117,21 @@ if __name__ == "__main__":
                         help='create an output file for each model containing the counts of correct/incorrect/total answers')
     args = parser.parse_args()
 
-    model_dfs = [multiple_accuracy_df(m, args.questions)
-                 for m in args.models]
+    model_dfs = []
+    with mp.Pool(len(args.models)) as pool:
+        mpfunc = ft.partial(multiple_accuracy_df, questions=args.questions)
+        for i, df in enumerate(pool.map(mpfunc, args.models)):
+            model_dfs.append(df)
+
+    for df, m in zip(model_dfs, args.models):
+        df.name = name(m)
 
     combined_df = combine_accuracy_dfs(model_dfs)
     if args.output:
         os.makedirs(args.output, exist_ok=True)
         path = os.path.join(args.output, f'{ACCURACY}{OUT_EXT}')
-        combined_df.round(3).T.to_csv(path, index_label=SECTION, header=args.header)
+        combined_df.round(3).T.to_csv(path, index_label=SECTION,
+                                      header=args.header)
     elif args.pprint:
         print(combined_df)
     else:
