@@ -13,8 +13,8 @@ Returns contexts either in `pairs` format or in `lines` format.
 """
 
 LANG = 'de'
-BATCH_SIZE = 10000
-N_THREADS = 8
+BATCH_SIZE = 20000
+N_THREADS = 16
 
 methods = {'ttraverse': TreeTraverse,
            'torder': TreeOrder,
