@@ -7,3 +7,4 @@ gensim
 keras
 SPARQLWrapper
 spacy
+fasttext
