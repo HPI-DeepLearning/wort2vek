@@ -173,27 +173,6 @@ Erdogan AKP Obama Demokraten
 Erdogan AKP Bush Republikaner
 Erdogan AKP Hitler NSDAP
 Erdogan AKP Honecker SED
-: Werk,Erzeuger
-Tisch Tischler Garten Gärtner
-Tisch Tischler Foto Fotograf
-Tisch Tischler Film Regisseur
-Tisch Tischler Auto Kfz-Mechaniker
-Garten Gärtner Tisch Tischler
-Garten Gärtner Foto Fotograf
-Garten Gärtner Film Regisseur
-Garten Gärtner Auto Kfz-Mechaniker
-Foto Fotograf Tisch Tischler
-Foto Fotograf Garten Gärtner
-Foto Fotograf Film Regisseur
-Foto Fotograf Auto Kfz-Mechaniker
-Film Regisseur Tisch Tischler
-Film Regisseur Garten Gärtner
-Film Regisseur Foto Fotograf
-Film Regisseur Auto Kfz-Mechaniker
-Auto Kfz-Mechaniker Tisch Tischler
-Auto Kfz-Mechaniker Garten Gärtner
-Auto Kfz-Mechaniker Foto Fotograf
-Auto Kfz-Mechaniker Film Regisseur
 : Bereich,Berufsbezeichnung
 Medizin Arzt Physik Physiker
 Medizin Arzt Biologie Biologe
