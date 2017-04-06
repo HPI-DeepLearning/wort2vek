@@ -2,6 +2,7 @@ from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 
+
 class Visualizer:
     """
     Visualize word embeddings in a two dimensional space using t-SNE or PCA.
@@ -29,7 +30,7 @@ class Visualizer:
     def plot(self, two_d_embeddings, labels):
         plt.figure()
         for i, label in enumerate(labels):
-            x, y = two_d_embeddings[i,:]
+            x, y = two_d_embeddings[i, :]
             plt.scatter(x, y)
             plt.annotate(label, xy=(x, y))
         plt.show()

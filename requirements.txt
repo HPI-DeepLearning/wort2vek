@@ -5,6 +5,5 @@ sklearn
 matplotlib
 gensim
 keras
-SPARQLWrapper
 spacy
 fasttext

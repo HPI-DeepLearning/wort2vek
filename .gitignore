@@ -162,7 +162,3 @@ dkms.conf
 # Mercurial
 *.hg
 *.hg/*
-
-# Tools (word2vecf, ...)
-tools/*
-!tools/.gitkeep

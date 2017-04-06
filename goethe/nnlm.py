@@ -7,7 +7,8 @@ import itertools
 from itertools import chain
 from collections import Counter
 
-class TrainingData(object):
+
+class TrainingData:
 
     UNKNOWN_TOKEN = "unk"
 
@@ -42,7 +43,8 @@ class TrainingData(object):
                     unk_count = unk_count + 1
         self.count[0][1] = unk_count
 
-        self.index2word = dict(zip(self.word2index.values(), self.word2index.keys()))
+        self.index2word = dict(
+            zip(self.word2index.values(), self.word2index.keys()))
 
     def sentence_dataset(self):
         for sentence in self.corpus.sentences():
@@ -58,7 +60,7 @@ class TrainingData(object):
     def ngram_dataset(self, n):
         for numbers in self.sentence_dataset():
             for i in range(0, len(numbers) - n + 1):
-                yield numbers[i:i+n]
+                yield numbers[i:i + n]
 
 
 class NNLM(object):
@@ -101,6 +103,7 @@ class NNLM(object):
     def split_data(self):
         raise Error("Subclass responsibility")
 
+
 class NgramNNLM(NNLM):
     def __init__(self, word2index, word2vec):
         super().__init__(word2index, word2vec)
@@ -136,6 +139,7 @@ class NgramNNLM(NNLM):
                             verbose=1)
         return model
 
+
 class RnnNNLM(NNLM):
     def __init__(self, word2index, word2vec, max_sequence_length=40):
         super().__init__(word2index, word2vec)
@@ -150,7 +154,7 @@ class RnnNNLM(NNLM):
 
     def sentence_parts(self, sentences):
         for sentence in sentences:
-            for i in range(0,len(sentence)):
+            for i in range(0, len(sentence)):
                 yield sentence[:i], sentence[i]
 
     def split_data(self, parts):
