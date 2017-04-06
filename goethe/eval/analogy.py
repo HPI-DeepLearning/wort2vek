@@ -57,7 +57,7 @@ def accuracy_df(model, questions):
     (accuracy, correct/incorrect/total answers) as columns.
     """
     sections = (gensim.models.KeyedVectors
-                .load_word2vec_format(model)
+                .load_word2vec_format(model, unicode_errors='ignore')
                 .accuracy(questions, restrict_vocab=100000))
 
     def collapse_section(s):
@@ -122,7 +122,7 @@ if __name__ == "__main__":
         df = multiple_accuracy_df(m, args.questions)
         df.name = name(m)
         model_dfs.append(df)
-        print(f'Evaluated {i+1} of {len(args.models)}')
+        print(f'Evaluated {i+1} of {len(args.models)} ({m})')
 
     combined_df = combine_accuracy_dfs(model_dfs)
 

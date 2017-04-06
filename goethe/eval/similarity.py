@@ -13,7 +13,7 @@ pairs_filenames = [pairs_65, pairs_222, pairs_350]
 
 def eval_similarity(model_filenames):
     for model_filename in model_filenames:
-        model = KeyedVectors.load_word2vec_format(model_filename)
+        model = KeyedVectors.load_word2vec_format(model_filename, unicode_errors='ignore')
         rows = []
         for pairs_filename in pairs_filenames:
             pair_file = os.path.join(eval_path, pairs_filename)
@@ -21,7 +21,7 @@ def eval_similarity(model_filenames):
             testset_name = pairs_filename.split(os.path.extsep)[0]
             row = [testset_name, sims[2], *sims[0], *sims[1]]
             rows.append(row)
-        model_name = os.path.basename(model_filename).split(os.path.extsep)[0]
+            model_name = ''.join(os.path.basename(model_filename).split(os.path.extsep)[:-1])
         df = pd.DataFrame(rows, columns=header).set_index('testset')
         yield model_name, df
 
